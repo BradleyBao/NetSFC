@@ -8,83 +8,36 @@ const GEO_OPTIONS = {
 
 function getLocation() {
     if (!navigator.geolocation) {
-        setStatus('This browser does not support geolocation.', 'error');
+        setStatus('This browser does not support this feature.', 'error');
         return;
     }
 
-    setLoading(true);
-    setStatus('Getting location info');
-    hideCoords();
-
-    navigator.geolocation.getCurrentPosition(
-        success,
-        errorResult,
-        GEO_OPTIONS
-    );
+    document.getElementById('button_locate').disabled = true;
+    document.getElementById('status').textContent = 'Locating';
+ 
+    navigator.geolocation.getCurrentPosition(success, errorResult, GEO_OPTIONS);
 }
 
 function success(position) {
-    setLoading(false);
+    const {latitude, longitude, accuracy } = position.coords;
 
-    const {latitude, longitude, accuracy, altitude } = position.coords;
+    document.getElementById('lat').textContent      = latitude.toFixed(6) + '°';
+    document.getElementById('long').textContent      = longitude.toFixed(6) + '°';
+    document.getElementById('accuracy').textContent = 'Math.round(accuracy)' + 'm';
+    document.getElementById('status').textContent   = 'Location acquired';
+    document.getElementById('button_locate').disabled  = false;
 
-    showCoords(latitude, longitude, accuracy); 
-    setStatus(`Location acquired (±${Math.round(accuracy)} m accuracy).`, 'success');
     placeMarker(latitude, longitude, accuracy);
 }
 
 function errorResult(error) {
-    setLoading(false);
-
-    switch (error.code) {
-        case 1: //Permission Denied
-            setStatus(
-                'Permission denied. To get location information, please give permission and try again', 'error'
-            );
-            break;
-        case 2: //Postion unavaliable
-            setStatus(
-                'Position is unavliable. Try changing location.', 'error'
-            );
-            break;
-        case 3: //Timed out
-            setStatus(
-                'GPS timed out, please try again', 'error'
-            );
-            break;
-        default:
-            setStatus('Unknown error (code ${error.code}): ${error.message}', 'error');
+    const messages = {
+        1: 'Permission denied, please allow location and try again.',
+        2: 'Position unavailable, check if GPS is enabled.',
+        3: 'Request timed out, please try again.'
     }
+
+    document.getElementById('status').textContent  = messages[error.code] || 'Unknown error.';
+    document.getElementById('button_locate').disabled = false;
 }
 
-function setLoading(loading) {
-    const button = document.getElementById('button_locate');
-    const spinner = document.getElementById('Spinner');
-    const label = document.getElementById('button_label');
-
-    button.disabled = loading;
-    if (loading) {
-        spinner.style.display = 'block';
-        label.textContent = 'Locating';
-    }
-    else {
-        spinner.style.display = 'none';
-        label.textContent = 'Get my location';
-    }
-}
-
-function setStatus(message, type = '') {
-    const element = document.getElementById('status');
-    element.textContent = message;
-    element.className = type;
-}
-
-function showCoords(lat, long, acc) {
-    const element = document.getElementById('coord');
-    element.style.display = 'inline_block';
-    element.textContent = `Lat: ${lat.toFixed(6)}°  Lng: ${long.toFixed(6)}°  ±${Math.round(acc)} m`;
-}
-
-function hideCoords() {
-    document.getElementById('coords').style.display = 'none';
-}
