@@ -1,0 +1,9 @@
+# .gitignore
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.code-workspace
+venv/
+.netsfc_pyvenv
+__pycache__/
