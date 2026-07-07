@@ -1,12 +1,12 @@
 // Latency Checker by using fetch, calculates with package send time and response time
-const API_HOST = 'http://localhost:8080';
+const API_HOST = window.ENV.API_HOST;
 
 async function measureLatency() {
     const t1 = Date.now();
     
     const mockPayload = {
         latitude: 1.0, 
-        longitude: 1.0,
+        longitude: 1.0, 
         signal: 3.0,
         signal_strength: 3.0,
         ping_ms: 1.0
@@ -14,7 +14,7 @@ async function measureLatency() {
     
     const response = await fetch(`${API_HOST}/api/measurements`, { 
         method:  'POST',
-        cache: 'no-store', // Kept successfully for cache bypassing
+        cache: 'no-store', 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockPayload) 
     });
@@ -29,16 +29,8 @@ async function sendLatency(latitude, longitude, accuracy, ping_ms) {
     const parsedPing = parseFloat(ping_ms);
     const rawAccuracy = parseFloat(accuracy);
     
-    let signalScore = 3.0;
+    let signalScore = 3.0; // Wasn't too sure what signal meant, will update later
     
-    if (!isNaN(rawAccuracy)) {
-        if (rawAccuracy <= 10) signalScore = 5.0;
-        else if (rawAccuracy <= 25) signalScore = 4.0;
-        else if (rawAccuracy <= 50) signalScore = 3.0;
-        else if (rawAccuracy <= 100) signalScore = 2.0;
-        else signalScore = 1.0;
-    }
-
     const info = {
         latitude: parsedLat,
         longitude: parsedLon,
@@ -49,7 +41,7 @@ async function sendLatency(latitude, longitude, accuracy, ping_ms) {
  
     const response = await fetch(`${API_HOST}/api/measurements`, {
         method:  'POST',
-        cache: 'no-store', // Kept successfully for cache bypassing
+        cache: 'no-store',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(info)
     });
