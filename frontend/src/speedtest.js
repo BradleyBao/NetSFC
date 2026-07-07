@@ -1,13 +1,11 @@
 // Latency Checker by using fetch, calculates with package send time and response time
-
 const API_HOST = 'http://localhost:8080';
 
 async function measureLatency() {
     const t1 = Date.now();
     
-    // Handshake mock values stay perfectly inside the 1-5 range
     const mockPayload = {
-        latitude: 1.0,
+        latitude: 1.0, 
         longitude: 1.0,
         signal: 3.0,
         signal_strength: 3.0,
@@ -16,7 +14,7 @@ async function measureLatency() {
     
     const response = await fetch(`${API_HOST}/api/measurements`, { 
         method:  'POST',
-        cache: 'no-store',
+        cache: 'no-store', // Kept successfully for cache bypassing
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mockPayload) 
     });
@@ -31,10 +29,7 @@ async function sendLatency(latitude, longitude, accuracy, ping_ms) {
     const parsedPing = parseFloat(ping_ms);
     const rawAccuracy = parseFloat(accuracy);
     
-    // FIX / MAPPING LOGIC: 
-    // Convert GPS accuracy meters (e.g., 60) into a strict 1-5 backend scale.
-    // Excellent accuracy (<10m) = 5, Poor accuracy (>50m) = 1.
-    let signalScore = 3.0; // Default fallback
+    let signalScore = 3.0;
     
     if (!isNaN(rawAccuracy)) {
         if (rawAccuracy <= 10) signalScore = 5.0;
@@ -45,15 +40,16 @@ async function sendLatency(latitude, longitude, accuracy, ping_ms) {
     }
 
     const info = {
-        latitude:        isNaN(parsedLat) ? 1.0 : parsedLat,
-        longitude:       isNaN(parsedLon) ? 1.0 : parsedLon,
-        signal:          signalScore,
+        latitude: parsedLat,
+        longitude: parsedLon,
+        signal: signalScore,
         signal_strength: signalScore, 
-        ping_ms:         isNaN(parsedPing) ? 1.0 : parsedPing,
+        ping_ms: parsedPing,
     };
  
     const response = await fetch(`${API_HOST}/api/measurements`, {
         method:  'POST',
+        cache: 'no-store', // Kept successfully for cache bypassing
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(info)
     });
@@ -62,6 +58,7 @@ async function sendLatency(latitude, longitude, accuracy, ping_ms) {
 }
 
 async function checkLatency() {
+
     const button = document.getElementById('button_latency');
     const status = document.getElementById('latency_status');
     const result = document.getElementById('latency_result');
@@ -73,9 +70,9 @@ async function checkLatency() {
     button.disabled = true;
     result.textContent = '';    
     result.style.color = '#1a1a1a';
-    status.textContent = 'Measuring Latency...';
     status.style.color = '#555';
-
+    status.textContent = 'Measuring Latency...';
+    
     let ping_ms;
 
     try {
@@ -89,7 +86,6 @@ async function checkLatency() {
         button.disabled = false;
         return;
     }
-    status.textContent = 'Latency measurement completed, sending data.';
 
     try {
         const response = await sendLatency(latitude, longitude, accuracy, ping_ms);

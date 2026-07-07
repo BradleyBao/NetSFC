@@ -50,6 +50,10 @@ function success(position) {
     document.getElementById('status').textContent   = 'Location acquired.';
     document.getElementById('button_locate').disabled = false;
 
+    const latencyButton = document.getElementById('button_latency');
+    const latencyStatus = document.getElementById('latency_status');
+    const latencyResult = document.getElementById('latency_result');
+
     if (boundCheck(latitude, longitude)) {
         setStatus('Location acquired.', 'success');
 
@@ -58,7 +62,15 @@ function success(position) {
 
         localStorage.setItem('latitude', latitude);
         localStorage.setItem('longitude', longitude);
-        localStorage.setItem('accuracy', accuracy);
+        localStorage.setItem('accuracy', accuracy); 
+
+        if (latencyButton) {
+            latencyButton.style.display = 'inline-block';
+        }
+        if (latencyStatus) {
+            latencyStatus.textContent = 'You are in SFC campus, you can now run the network latency test.';
+            latencyStatus.style.color = '#2e7d52'; 
+        }
     }
 
     else {
@@ -66,6 +78,17 @@ function success(position) {
 
         document.getElementById('heatmap-link').style.display = 'none';
         document.getElementById('bounds-status').textContent = 'You are outside SFC Campus.';
+
+        if (latencyButton) {
+            latencyButton.style.display = 'none';
+        }
+        if (latencyStatus) {
+            latencyStatus.textContent = 'Latency test restricted: You must be on SFC Campus to measure network speeds.';
+            latencyStatus.style.color = '#c0392b'; 
+        }
+        if (latencyResult) {
+            latencyResult.textContent = '';
+        }
     }
 }
 
