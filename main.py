@@ -5,6 +5,7 @@ import sqlite3, os
 from typing import Any, Dict, List
 from dotenv import load_dotenv
 from loguru import logger
+from init_db import init_db
 
 load_dotenv()
 APITITLE:str | None = os.getenv("APITITLE")
@@ -16,6 +17,7 @@ if not APITITLE or not VERSION or not DB_NAME:
     raise ValueError("Configuration Value is empty, check your .env")
 
 app = FastAPI(title=APITITLE, version=VERSION)
+init_db(DB_NAME)
 
 # TODO Enable CORS for development, should be removed in production
 app.add_middleware(
