@@ -1,33 +1,33 @@
 [
   {
-    "id": 2,
-    "name": "Men's Washroom - Alpha Building 2F",
+    "id": 1,
+    "name": "Men's Washroom - Omega Building 2F",
     "type": "washroom",
-    "building": "Alpha Building",
+    "building": "Omega Building",
     "floor": "2F",
     "latitude": 35.387778,
     "longitude": 139.428889
   },
   {
-    "id": 3,
-    "name": "Women's Washroom - Alpha Building 2F",
+    "id": 2,
+    "name": "Women's Washroom - Omega Building 2F",
     "type": "washroom",
-    "building": "Alpha Building",
+    "building": "Omega Building",
+    "floor": "2F",
+    "latitude": 35.387778,
+    "longitude": 139.428056
+  },
+  {
+    "id": 3,
+    "name": "Garbage Cans - Omega Building 2F",
+    "type": "garbage",
+    "building": "Omega Building",
     "floor": "2F",
     "latitude": 35.387778,
     "longitude": 139.428056
   },
   {
     "id": 4,
-    "name": "Garbage Cans - Alpha Building 2F",
-    "type": "garbage",
-    "building": "Alpha Building",
-    "floor": "2F",
-    "latitude": 35.387778,
-    "longitude": 139.428056
-  },
-  {
-    "id": 5,
     "name": "Garbage Cans - Omicron Building 1F",
     "type": "garbage",
     "building": "Omicron Building",
@@ -36,7 +36,7 @@
     "longitude": 139.426667
   },
   {
-    "id": 6,
+    "id": 5,
     "name": "Men's Washroom - Omicron Building 1F (Front)",
     "type": "washroom",
     "building": "Omicron Building",
@@ -45,7 +45,7 @@
     "longitude": 139.426667
   },
   {
-    "id": 7,
+    "id": 6,
     "name": "Women's Washroom - Omicron Building 1F (Front)",
     "type": "washroom",
     "building": "Omicron Building",
@@ -54,7 +54,7 @@
     "longitude": 139.426667
   },
   {
-    "id": 8,
+    "id": 7,
     "name": "Garbage Cans - Omicron Building 2F (Front)",
     "type": "garbage",
     "building": "Omicron Building",
@@ -63,7 +63,7 @@
     "longitude": 139.426944
   },
   {
-    "id": 9,
+    "id": 8,
     "name": "Printer - Omicron Building (Back)",
     "type": "printer",
     "building": "Omicron Building",
@@ -72,7 +72,7 @@
     "longitude": 139.426528
   },
   {
-    "id": 10,
+    "id": 9,
     "name": "Garbage Cans - Omicron Building (Back)",
     "type": "garbage",
     "building": "Omicron Building",
@@ -81,7 +81,7 @@
     "longitude": 139.426528
   },
   {
-    "id": 11,
+    "id": 10,
     "name": "Women's Washroom - Omicron Building (Back)",
     "type": "washroom",
     "building": "Omicron Building",
@@ -90,7 +90,7 @@
     "longitude": 139.426528
   },
   {
-    "id": 12,
+    "id": 11,
     "name": "Accessible Washroom - Omicron Building (Back)",
     "type": "accessible_washroom",
     "building": "Omicron Building",
@@ -99,7 +99,7 @@
     "longitude": 139.426528
   },
   {
-    "id": 13,
+    "id": 12,
     "name": "Men's Washroom - Omicron Building (Back)",
     "type": "washroom",
     "building": "Omicron Building",
@@ -108,7 +108,7 @@
     "longitude": 139.426528
   },
   {
-    "id": 14,
+    "id": 13,
     "name": "Garbage Cans - Omicron Building 2F (Back)",
     "type": "garbage",
     "building": "Omicron Building",
@@ -117,7 +117,7 @@
     "longitude": 139.426528
   },
   {
-    "id": 15,
+    "id": 14,
     "name": "Elevator - Omicron Building 2F (Back)",
     "type": "elevator",
     "building": "Omicron Building",
@@ -126,7 +126,7 @@
     "longitude": 139.426528
   },
   {
-    "id": 16,
+    "id": 15,
     "name": "Printer - Epsilon Building 1F (Back)",
     "type": "printer",
     "building": "Epsilon Building",
@@ -135,16 +135,16 @@
     "longitude": 139.426528
   },
   {
-    "id": 17,
+    "id": 16,
     "name": "Water Fountain - Kappa Building 1F (Front)",
     "type": "water_fountain",
     "building": "Kappa Building",
     "floor": "1F",
-    "latitude": 35.387500,
+    "latitude": 35.3875,
     "longitude": 139.426528
   },
   {
-    "id": 18,
+    "id": 17,
     "name": "Water Fountain - Sigma Building Lounge B1F",
     "type": "water_fountain",
     "building": "Sigma Building",
@@ -153,12 +153,336 @@
     "longitude": 139.426528
   },
   {
-    "id": 19,
+    "id": 18,
     "name": "Printer - Sigma Building Cafeteria",
     "type": "printer",
     "building": "Sigma Building",
     "floor": "1F",
     "latitude": 35.387222,
     "longitude": 139.426528
+  },
+  {
+    "id": 19,
+    "name": "Women's Washroom - Kamoike Lounge",
+    "type": "washroom",
+    "building": "Kamoike Lounge",
+    "floor": "1F",
+    "latitude": 35.387222,
+    "longitude": 139.426389
+  },
+  {
+    "id": 20,
+    "name": "Men's Washroom - Kamoike Lounge",
+    "type": "washroom",
+    "building": "Kamoike Lounge",
+    "floor": "1F",
+    "latitude": 35.386944,
+    "longitude": 139.426111
+  },
+  {
+    "id": 21,
+    "name": "Women's Washroom - Theta Building",
+    "type": "washroom",
+    "building": "Theta Building",
+    "floor": "1F",
+    "latitude": 35.389167,
+    "longitude": 139.4275
+  },
+  {
+    "id": 22,
+    "name": "Men's Washroom - Theta Building",
+    "type": "washroom",
+    "building": "Theta Building",
+    "floor": "1F",
+    "latitude": 35.388889,
+    "longitude": 139.427222
+  },
+  {
+    "id": 23,
+    "name": "Garbage Cans - Theta Building",
+    "type": "garbage",
+    "building": "Theta Building",
+    "floor": "1F",
+    "latitude": 35.388889,
+    "longitude": 139.427222
+  },
+  {
+    "id": 24,
+    "name": "Garbage Cans - Theta Building (2)",
+    "type": "garbage",
+    "building": "Theta Building",
+    "floor": "1F",
+    "latitude": 35.388611,
+    "longitude": 139.427778
+  },
+  {
+    "id": 25,
+    "name": "Garbage Cans - Iota Building 1F (Front)",
+    "type": "garbage",
+    "building": "Iota Building",
+    "floor": "1F",
+    "latitude": 35.388333,
+    "longitude": 139.426667
+  },
+  {
+    "id": 26,
+    "name": "Women's Washroom - Iota Building 1F (Front)",
+    "type": "washroom",
+    "building": "Iota Building",
+    "floor": "1F",
+    "latitude": 35.388333,
+    "longitude": 139.426944
+  },
+  {
+    "id": 27,
+    "name": "Men's Washroom - Iota Building 1F (Front)",
+    "type": "washroom",
+    "building": "Iota Building",
+    "floor": "1F",
+    "latitude": 35.388333,
+    "longitude": 139.426667
+  },
+  {
+    "id": 28,
+    "name": "Garbage Cans - Iota Building 2F (Front)",
+    "type": "garbage",
+    "building": "Iota Building",
+    "floor": "2F",
+    "latitude": 35.388333,
+    "longitude": 139.426667
+  },
+  {
+    "id": 29,
+    "name": "Women's Washroom - Iota Building 1F (Back)",
+    "type": "washroom",
+    "building": "Iota Building",
+    "floor": "1F",
+    "latitude": 35.388333,
+    "longitude": 139.426111
+  },
+  {
+    "id": 30,
+    "name": "Men's Washroom - Iota Building 1F (Back)",
+    "type": "washroom",
+    "building": "Iota Building",
+    "floor": "1F",
+    "latitude": 35.388333,
+    "longitude": 139.426389
+  },
+  {
+    "id": 31,
+    "name": "Garbage Cans - Iota Building 1F (Back)",
+    "type": "garbage",
+    "building": "Iota Building",
+    "floor": "1F",
+    "latitude": 35.388611,
+    "longitude": 139.426389
+  },
+  {
+    "id": 32,
+    "name": "Garbage Cans - Epsilon Building 1F (Front)",
+    "type": "garbage",
+    "building": "Epsilon Building",
+    "floor": "1F",
+    "latitude": 35.387778,
+    "longitude": 139.426389
+  },
+  {
+    "id": 33,
+    "name": "Men's Washroom - Epsilon Building 1F (Front)",
+    "type": "washroom",
+    "building": "Epsilon Building",
+    "floor": "1F",
+    "latitude": 35.3875,
+    "longitude": 139.426389
+  },
+  {
+    "id": 34,
+    "name": "Women's Washroom - Epsilon Building 1F (Front)",
+    "type": "washroom",
+    "building": "Epsilon Building",
+    "floor": "1F",
+    "latitude": 35.387778,
+    "longitude": 139.426389
+  },
+  {
+    "id": 35,
+    "name": "Garbage Cans - Epsilon Building 2F (Front)",
+    "type": "garbage",
+    "building": "Epsilon Building",
+    "floor": "2F",
+    "latitude": 35.387778,
+    "longitude": 139.426667
+  },
+  {
+    "id": 36,
+    "name": "Men's Washroom - Epsilon Building 1F (Back)",
+    "type": "washroom",
+    "building": "Epsilon Building",
+    "floor": "1F",
+    "latitude": 35.388056,
+    "longitude": 139.426389
+  },
+  {
+    "id": 37,
+    "name": "Accessible Washroom - Epsilon Building 1F (Back)",
+    "type": "accessible_washroom",
+    "building": "Epsilon Building",
+    "floor": "1F",
+    "latitude": 35.388333,
+    "longitude": 139.426667
+  },
+  {
+    "id": 38,
+    "name": "Women's Washroom - Epsilon Building 1F (Back)",
+    "type": "washroom",
+    "building": "Epsilon Building",
+    "floor": "1F",
+    "latitude": 35.388056,
+    "longitude": 139.426389
+  },
+  {
+    "id": 39,
+    "name": "Garbage Can (Back) - Epsilon Building 1F",
+    "type": "garbage_can",
+    "building": "Epsilon Building",
+    "floor": "1F",
+    "latitude": 35.387778,
+    "longitude": 139.426389
+  },
+  {
+    "id": 40,
+    "name": "Garbage Can (Back) - Epsilon Building 1F (2)",
+    "type": "garbage_can",
+    "building": "Epsilon Building",
+    "floor": "1F",
+    "latitude": 35.387778,
+    "longitude": 139.426389
+  },
+  {
+    "id": 41,
+    "name": "Women's Washroom (Back) - Kappa Building 1F",
+    "type": "washroom",
+    "building": "Kappa Building",
+    "floor": "1F",
+    "latitude": 35.387778,
+    "longitude": 139.426111
+  },
+  {
+    "id": 42,
+    "name": "Men's Washroom (Back) - Kappa Building 1F",
+    "type": "washroom",
+    "building": "Kappa Building",
+    "floor": "1F",
+    "latitude": 35.387778,
+    "longitude": 139.426111
+  },
+  {
+    "id": 43,
+    "name": "Garbage Can (Back) - Kappa Building 1F",
+    "type": "garbage_can",
+    "building": "Kappa Building",
+    "floor": "1F",
+    "latitude": 35.3875,
+    "longitude": 139.426667
+  },
+  {
+    "id": 44,
+    "name": "Women's Washroom (Front) - Kappa Building 1F",
+    "type": "washroom",
+    "building": "Kappa Building",
+    "floor": "1F",
+    "latitude": 35.387778,
+    "longitude": 139.426667
+  },
+  {
+    "id": 45,
+    "name": "Men's Washroom (Front) - Kappa Building 1F",
+    "type": "washroom",
+    "building": "Kappa Building",
+    "floor": "1F",
+    "latitude": 35.387778,
+    "longitude": 139.426667
+  },
+  {
+    "id": 46,
+    "name": "Garbage Cans (Front) - Kappa Building 2F",
+    "type": "garbage_can",
+    "building": "Kappa Building",
+    "floor": "2F",
+    "latitude": 35.387778,
+    "longitude": 139.426389
+  },
+  {
+    "id": 47,
+    "name": "Garbage Cans - Front of Sigma Building",
+    "type": "garbage_can",
+    "building": "Sigma Building",
+    "floor": "1F",
+    "latitude": 35.387222,
+    "longitude": 139.426389
+  },
+  {
+    "id": 48,
+    "name": "Vending Machine - Top of Sigma Building",
+    "type": "vending_machine",
+    "building": "Sigma Building",
+    "floor": "Rooftop",
+    "latitude": 35.3875,
+    "longitude": 139.426389
+  },
+  {
+    "id": 49,
+    "name": "Vending Machine - Subway",
+    "type": "vending_machine",
+    "building": "Subway",
+    "floor": "1F",
+    "latitude": 35.387778,
+    "longitude": 139.427222
+  },
+  {
+    "id": 50,
+    "name": "Accessible Washroom - Eta Building 1F",
+    "type": "accessible_washroom",
+    "building": "Eta Building",
+    "floor": "1F",
+    "latitude": 35.389444,
+    "longitude": 139.427778
+  },
+  {
+    "id": 51,
+    "name": "Women's Washroom - Eta Building 1F",
+    "type": "washroom",
+    "building": "Eta Building",
+    "floor": "1F",
+    "latitude": 35.389444,
+    "longitude": 139.427778
+  },
+  {
+    "id": 52,
+    "name": "Men's Washroom - Eta Building 1F",
+    "type": "washroom",
+    "building": "Eta Building",
+    "floor": "1F",
+    "latitude": 35.389722,
+    "longitude": 139.427778
+  },
+  {
+    "id": 53,
+    "name": "Men's Washroom - Eta Building 2F",
+    "type": "washroom",
+    "building": "Eta Building",
+    "floor": "2F",
+    "latitude": 35.389444,
+    "longitude": 139.427778
+  },
+  {
+    "id": 54,
+    "name": "Women's Washroom - Eta Building 2F",
+    "type": "washroom",
+    "building": "Eta Building",
+    "floor": "2F",
+    "latitude": 35.389444,
+    "longitude": 139.427778
   }
 ]
