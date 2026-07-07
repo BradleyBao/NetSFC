@@ -5,6 +5,7 @@ import sqlite3, os
 from typing import Any, Dict, List
 from dotenv import load_dotenv
 from loguru import logger
+from init_db import init_db
 
 load_dotenv()
 APITITLE:str | None = os.getenv("APITITLE")

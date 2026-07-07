@@ -7,10 +7,10 @@ const GEO_OPTIONS = {
 }
 
 const BOUNDS = {
-    minLat: 139.424,
-    minLng: 35.384,
-    maxLat: 139.433,
-    maxLng: 35.393,
+    minLat: 35.384,
+    minLng: 139.424,
+    maxLat: 35.393,
+    maxLng: 139.433,
 }
 
 function boundCheck(lat, lng) {
