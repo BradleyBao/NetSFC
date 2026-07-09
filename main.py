@@ -1,11 +1,12 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-import sqlite3, os
+import sqlite3, os, asyncio
 from typing import Any, Dict, List
 from dotenv import load_dotenv
 from loguru import logger
 from init_db import init_db
+from typing import Coroutine, Any
 
 load_dotenv()
 APITITLE:str | None = os.getenv("APITITLE")
@@ -41,9 +42,53 @@ class POIResponse(BaseModel):
     latitude: float
     longitude: float
 
+class ConnectionManager():
+    def __init__(self):
+        self.connections:list[WebSocket] = []
+    
+    async def connect(self, websocket:WebSocket):
+        await websocket.accept()
+        self.connections.append(websocket)
+        logger.info("New connection established")
+
+    def disconnect(self, websocket:WebSocket):
+        if websocket in self.connections:
+            self.connections.remove(websocket)
+            logger.info("Client disconnected")
+
+    async def broadcast_json(self, data: dict[str,str] | list[str]):
+        if not self.connections:
+            return 
+        
+        tasks:list[Coroutine[Any, Any, None]] = []
+        for connection in self.connections:
+            tasks.append(self._send_json(connection, data))
+        await asyncio.gather(*tasks)
+
+    async def _send_json(self, websocket:WebSocket, data: dict[str,str] | list[str]):
+        try:
+            await websocket.send_json(data)
+        except Exception:
+            self.disconnect(websocket)
+
+manager = ConnectionManager()
+
+@app.websocket("/ws/heatmap")
+async def heatmap_websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+    except Exception as e:
+        logger.error(f"Unexpected WebSocket error: {str(e)}")
+        manager.disconnect(websocket)
+
 @app.post("/api/measurements", status_code=status.HTTP_201_CREATED)
 async def report_measurement(report: MeasurementReport):
     try:
+        # TODO Broadcast to all other devices using WebSocket
         if not DB_NAME:
             logger.error("Invalid Database Name")
             raise ValueError("Database invalid.")
