@@ -77,13 +77,13 @@ function success(position) {
         setStatus('Location acquired', 'success')
 
         document.getElementById('heatmap-link').style.display = 'none';
-        document.getElementById('bounds-status').textContent = 'You are outside SFC Campus.';
+        document.getElementById('bounds-status').textContent = 'Map access denied: You must be on SFC Campus to access the map.';
 
         if (latencyButton) {
             latencyButton.style.display = 'none';
         }
         if (latencyStatus) {
-            latencyStatus.textContent = 'Latency test restricted: You must be on SFC Campus to measure network speeds.';
+            latencyStatus.textContent = 'Latency test restricted: You must be on SFC Campus to measure network speed.';
             latencyStatus.style.color = '#c0392b'; 
         }
         if (latencyResult) {
