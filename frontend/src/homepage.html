@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
+  <title>Welcome to Location Heatmap Service</title>
+    <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 480px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #1a1a1a;
+    }
+ 
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #4f8ef7;
+      padding-bottom: 8px;
+    }
+ 
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 20px 0 8px;
+      color: #444;
+    }
+ 
+    p {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+ 
+    span {
+      font-weight: 500;
+    }
+ 
+    /* Button Design */
+    #button_locate {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      background: #4f8ef7;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 4px;
+    }
+ 
+    #button_locate:hover:not(:disabled) { background: #3a7de8; }
+    #button_locate:active:not(:disabled) { transform: scale(0.97); }
+    #button_locate:disabled { opacity: 0.5; cursor: not-allowed; }
+ 
+    #button_latency {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      background: #fff;
+      color: #4f8ef7;
+      border: 1.5px solid #4f8ef7;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, transform 0.1s;
+    }
+ 
+    #button_latency:hover:not(:disabled) { background: #4f8ef7; color: #fff; }
+    #button_latency:active:not(:disabled) { transform: scale(0.97); }
+    #button_latency:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Status Message Design */
+    #status { font-size: 13px; color: #555; }
+    #status.success { color: #2e7d52; }
+    #status.error   { color: #c0392b; }
+ 
+    /* Heatmap Link Design */
+    .heatmap-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 9px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #4f8ef7;
+      border: 1.5px solid #4f8ef7;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+    }
+ 
+    .heatmap-link:hover {
+      background: #4f8ef7;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Welcome to SFC heatmap service</h1>
+
+<button id="button_locate" onclick="getLocation()">Get my location</button>
+
+<h2>GPS Coordinates</h2>
+<p>Latitude: <span id="lat">—</span></p>
+<p>Longitude: <span id="long">—</span></p>
+<p>Accuracy: <span id="accuracy">—</span></p>
+<p>Status: <span id="status">Press the button to get your location.</span></p>
+
+<h2>Network Latency</h2>
+<button id="button_latency" type="button" style="display:none;">Run latency test</button>
+<p id="latency_status" style="font-size:13px; color:#555; margin-top:6px;"></p>
+<p id="latency_result" style="font-size:13px; font-weight:500; margin-top:2px;"></p>
+
+<h2>Location Heatmap</h2> 
+
+<a class="heatmap-link" id="heatmap-link" href="map.html" style="display:none;"> View heatmap:</a>
+<p id="bounds-status" style="font-size:13px; color:#555;"></p>
+
+<script src="config.js" defer></script>
+
+<script src="measure_page.js" defer></script>
+<script src="speedtest.js" defer></script>
+
+</body>
+</html>

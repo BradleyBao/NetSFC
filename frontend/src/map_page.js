@@ -13,6 +13,7 @@ let heatLayer;
 let heatPoints = [];
 let currentMarker = null;
 let accuracyCircle = null;
+// Maybe use document.addEventListener('DomContentLoaded, ...) instead of window.onload for asynchronous loading
 
 window.onload = function() {
     map = L.map('map', {
