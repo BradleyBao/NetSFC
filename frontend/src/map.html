@@ -55,6 +55,43 @@
     .floating-title a:hover {
       text-decoration: underline;
     }
+
+    .poi-div-icon {
+      pointer-events: auto;
+    }
+
+    .poi-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(33, 37, 41, 0.12);
+      border-radius: 18px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+      font-size: 13px;
+      color: #111;
+      white-space: nowrap;
+    }
+
+    .poi-icon {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .poi-title {
+      font-weight: 600;
+      color: #111;
+    }
+
+    .poi-tooltip {
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+    }
   </style>
 </head>
 <body>
@@ -66,6 +103,7 @@
   <a href="homepage.html">Back to homepage</a>
 </div>
 
+<script src="config.js" defer></script>
 <script src="map_page.js" defer></script>
 
 </body>

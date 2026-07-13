@@ -5,8 +5,10 @@
     "type": "washroom",
     "building": "Alpha Building",
     "floor": "2F",
-    "latitude": 35.387778,
-    "longitude": 139.428889
+    "coords": [
+      35.387778,
+      139.428889
+    ]
   },
   {
     "id": 3,
@@ -14,8 +16,10 @@
     "type": "washroom",
     "building": "Alpha Building",
     "floor": "2F",
-    "latitude": 35.387778,
-    "longitude": 139.428056
+    "coords": [
+      35.387778,
+      139.428056
+    ]
   },
   {
     "id": 4,
@@ -23,8 +27,10 @@
     "type": "garbage",
     "building": "Alpha Building",
     "floor": "2F",
-    "latitude": 35.387778,
-    "longitude": 139.428056
+    "coords": [
+      35.387778,
+      139.428056
+    ]
   },
   {
     "id": 5,
@@ -32,8 +38,10 @@
     "type": "garbage",
     "building": "Omicron Building",
     "floor": "1F",
-    "latitude": 35.388056,
-    "longitude": 139.426667
+    "coords": [
+      35.388056,
+      139.426667
+    ]
   },
   {
     "id": 6,
@@ -41,8 +49,10 @@
     "type": "washroom",
     "building": "Omicron Building",
     "floor": "1F",
-    "latitude": 35.388611,
-    "longitude": 139.426667
+    "coords": [
+      35.388611,
+      139.426667
+    ]
   },
   {
     "id": 7,
@@ -50,8 +60,10 @@
     "type": "washroom",
     "building": "Omicron Building",
     "floor": "1F",
-    "latitude": 35.388611,
-    "longitude": 139.426667
+    "coords": [
+      35.388611,
+      139.426667
+    ]
   },
   {
     "id": 8,
@@ -59,8 +71,10 @@
     "type": "garbage",
     "building": "Omicron Building",
     "floor": "2F",
-    "latitude": 35.388333,
-    "longitude": 139.426944
+    "coords": [
+      35.388333,
+      139.426944
+    ]
   },
   {
     "id": 9,
@@ -68,8 +82,10 @@
     "type": "printer",
     "building": "Omicron Building",
     "floor": "1F",
-    "latitude": 35.388611,
-    "longitude": 139.426528
+    "coords": [
+      35.388611,
+      139.426528
+    ]
   },
   {
     "id": 10,
@@ -77,8 +93,10 @@
     "type": "garbage",
     "building": "Omicron Building",
     "floor": "1F",
-    "latitude": 35.388611,
-    "longitude": 139.426528
+    "coords": [
+      35.388611,
+      139.426528
+    ]
   },
   {
     "id": 11,
@@ -86,8 +104,10 @@
     "type": "washroom",
     "building": "Omicron Building",
     "floor": "1F",
-    "latitude": 35.388611,
-    "longitude": 139.426528
+    "coords": [
+      35.388611,
+      139.426528
+    ]
   },
   {
     "id": 12,
@@ -95,8 +115,10 @@
     "type": "accessible_washroom",
     "building": "Omicron Building",
     "floor": "1F",
-    "latitude": 35.388333,
-    "longitude": 139.426528
+    "coords": [
+      35.388333,
+      139.426528
+    ]
   },
   {
     "id": 13,
@@ -104,8 +126,10 @@
     "type": "washroom",
     "building": "Omicron Building",
     "floor": "1F",
-    "latitude": 35.388333,
-    "longitude": 139.426528
+    "coords": [
+      35.388333,
+      139.426528
+    ]
   },
   {
     "id": 14,
@@ -113,8 +137,10 @@
     "type": "garbage",
     "building": "Omicron Building",
     "floor": "2F",
-    "latitude": 35.388611,
-    "longitude": 139.426528
+    "coords": [
+      35.388611,
+      139.426528
+    ]
   },
   {
     "id": 15,
@@ -122,8 +148,10 @@
     "type": "elevator",
     "building": "Omicron Building",
     "floor": "2F",
-    "latitude": 35.388611,
-    "longitude": 139.426528
+    "coords": [
+      35.388611,
+      139.426528
+    ]
   },
   {
     "id": 16,
@@ -131,8 +159,10 @@
     "type": "printer",
     "building": "Epsilon Building",
     "floor": "1F",
-    "latitude": 35.387778,
-    "longitude": 139.426528
+    "coords": [
+      35.387778,
+      139.426528
+    ]
   },
   {
     "id": 17,
@@ -140,8 +170,10 @@
     "type": "water_fountain",
     "building": "Kappa Building",
     "floor": "1F",
-    "latitude": 35.387500,
-    "longitude": 139.426528
+    "coords": [
+      35.3875,
+      139.426528
+    ]
   },
   {
     "id": 18,
@@ -149,8 +181,10 @@
     "type": "water_fountain",
     "building": "Sigma Building",
     "floor": "B1F",
-    "latitude": 35.387222,
-    "longitude": 139.426528
+    "coords": [
+      35.387222,
+      139.426528
+    ]
   },
   {
     "id": 19,
@@ -158,7 +192,9 @@
     "type": "printer",
     "building": "Sigma Building",
     "floor": "1F",
-    "latitude": 35.387222,
-    "longitude": 139.426528
+    "coords": [
+      35.387222,
+      139.426528
+    ]
   }
 ]
