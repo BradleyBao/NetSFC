@@ -1,12 +1,11 @@
 from fastapi import FastAPI, HTTPException, status, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-import sqlite3, os, asyncio
-from typing import Any, Dict, List
+import sqlite3, os, asyncio, json
+from typing import Any, Dict, List, Coroutine, Tuple
 from dotenv import load_dotenv
 from loguru import logger
 from init_db import init_db
-from typing import Coroutine, Any
 
 load_dotenv()
 APITITLE:str | None = os.getenv("APITITLE")
@@ -39,8 +38,11 @@ class POIResponse(BaseModel):
     id: int
     name: str
     layer_type: str
+    building: str | None = None
+    floor: str | None = None
     latitude: float
     longitude: float
+    coords: list[Any]
 
 class ConnectionManager():
     def __init__(self):
@@ -104,6 +106,61 @@ async def report_measurement(report: MeasurementReport):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
+POIRow = Tuple[
+    int,        # id
+    str,        # name
+    str,        # layer_type
+    str | None, # building
+    str | None, # floor
+    float,      # latitude
+    float,      # longitude
+    str         # coords (JSON)
+]
+
+def parse_poi_row(row: POIRow) -> Dict[str, Any]:
+    coords = json.loads(row[7]) if row[7] else [row[5], row[6]]
+    return {
+        "id": row[0],
+        "name": row[1],
+        "layer_type": row[2],
+        "building": row[3] if len(row) > 3 else None,
+        "floor": row[4] if len(row) > 4 else None,
+        "latitude": row[5] if len(row) > 5 else row[2],
+        "longitude": row[6] if len(row) > 6 else row[3],
+        "coords": coords,
+    }
+
+@app.get("/api/pois", response_model=List[POIResponse])
+async def get_all_pois():
+    try:
+        if not DB_NAME:
+            logger.error("Invalid Database Name")
+            raise ValueError("Database invalid.")
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT id, name, layer_type, building, floor, latitude, longitude, coords
+            FROM campus_pois
+        ''')
+        rows = cursor.fetchall()
+        conn.close()
+        results: List[Dict[str, Any]] = [
+            {
+                "id": row[0],
+                "name": row[1],
+                "layer_type": row[2],
+                "building": row[3],
+                "floor": row[4],
+                "latitude": row[5],
+                "longitude": row[6],
+                "coords": json.loads(row[7]) if row[7] else [row[5], row[6]],
+            }
+            for row in rows
+        ]
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 @app.get("/api/layers/{layerType}", response_model=List[POIResponse])
 async def get_layer_items(layerType: str):
     try:
@@ -113,19 +170,22 @@ async def get_layer_items(layerType: str):
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         cursor.execute('''
-            SELECT id, name, latitude, longitude 
+            SELECT id, name, layer_type, building, floor, latitude, longitude, coords
             FROM campus_pois 
             WHERE layer_type = ?
         ''', (layerType,))
         rows = cursor.fetchall()
         conn.close()
-        results:List[Dict[str, Any]] = [
+        results: List[Dict[str, Any]] = [
             {
-                "id": row[0], 
-                "name": row[1], 
-                "layer_type": layerType,
-                "latitude": row[2], 
-                "longitude": row[3]
+                "id": row[0],
+                "name": row[1],
+                "layer_type": row[2],
+                "building": row[3],
+                "floor": row[4],
+                "latitude": row[5],
+                "longitude": row[6],
+                "coords": json.loads(row[7]) if row[7] else [row[5], row[6]],
             }
             for row in rows
         ]

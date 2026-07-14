@@ -32,8 +32,32 @@
   {
     "id": 1,
     "name": "Delta Building 1F Water Dispenser",
+    "layer_type": "water_fountain",
+    "building": "Delta Building",
+    "floor": "1F",
     "latitude": 35.3881,
-    "longitude": 139.4272
+    "longitude": 139.4272,
+    "coords": [35.3881, 139.4272]
+  }
+]
+```
+
+## Get All POIs
+
+- URL: `/api/pois`
+- Method: `GET`
+- Response (JSON)
+```json
+[
+  {
+    "id": 1,
+    "name": "Delta Building 1F Water Dispenser",
+    "layer_type": "water_fountain",
+    "building": "Delta Building",
+    "floor": "1F",
+    "latitude": 35.3881,
+    "longitude": 139.4272,
+    "coords": [35.3881, 139.4272]
   }
 ]
 ```
