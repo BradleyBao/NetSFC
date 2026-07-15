@@ -49,29 +49,98 @@ async function sendLatency(latitude, longitude, accuracy, ping_ms) {
     return response;
 }
 
-async function checkLatency() {
+async function measureBandwidth(latitude, longitude, sizeBytes = 2_000_000) {
+    const padding = 'x'.repeat(sizeBytes);
 
-    const button = document.getElementById('button_latency');
-    const status = document.getElementById('latency_status');
-    const result = document.getElementById('latency_result');
+    const mockPayload = {
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        signal: 3.0,
+        signal_strength: 3.0,
+        ping_ms: 1.0,
+        _padding: padding,
+    };
+
+    const body = JSON.stringify(mockPayload);
+    const actualBytes = new Blob([body]).size;
+
+    const t1 = Date.now();
+
+    await fetch(`${API_HOST}/api/measurements`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+    });
+
+    const seconds = (Date.now() - t1) / 1000;
+    const mbps = (actualBytes * 8 / seconds) / 1_000_000;
+
+    return mbps;
+}
+
+async function sendBandwidth(latitude, longitude, ping_ms, mbps) {
+    const parsedLat = parseFloat(latitude);
+    const parsedLon = parseFloat(longitude);
+    const parsedPing = parseFloat(ping_ms);
+    const parsedMbps = parseFloat(mbps);
+    let signalScore = 3.0; 
+
+    const info = {
+        latitude: parsedLat,
+        longitude: parsedLon,
+        signal: signalScore,
+        signal_strength: signalScore,
+        ping_ms: parsedPing,
+        bandwidth_mbps: parsedMbps,
+    };
+
+    const response = await fetch(`${API_HOST}/api/measurements`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(info)
+    });
+
+    return response;
+}
+
+async function checkNetwork() {
+
+    const button = document.getElementById('button_network');
+    const status = document.getElementById('network_status');
+    const result = document.getElementById('network_result');
 
     const latitude = localStorage.getItem('latitude');
     const longitude = localStorage.getItem('longitude');
     const accuracy = localStorage.getItem('accuracy');
 
     button.disabled = true;
-    result.textContent = '';    
+    result.textContent = '';
     result.style.color = '#1a1a1a';
     status.style.color = '#555';
-    status.textContent = 'Measuring Latency...';
-    
-    let ping_ms;
 
+    let ping_ms;
+    let mbps;
+
+    status.textContent = 'Measuring Latency...';
     try {
         ping_ms = await measureLatency();
+
+        const latencyResponse = await sendLatency(latitude, longitude, accuracy, ping_ms);
+
+        if (!latencyResponse.ok) {
+            const serverErrText = await latencyResponse.text();
+            status.textContent = `Server Internal Error (${latencyResponse.status}).`;
+            status.style.color = '#c0392b';
+            result.textContent = `DB Error Logs: ${serverErrText}`;
+            result.style.color = '#c0392b';
+            button.disabled = false;
+            return;
+        }
     }
     catch (err) {
-        status.textContent = 'Error reaching /api/measurements during handshake.';
+        status.textContent = 'Latency measurement/POST failed.';
         status.style.color = '#c0392b';
         result.textContent = `Details: ${err.message}`;
         result.style.color = '#c0392b';
@@ -79,24 +148,29 @@ async function checkLatency() {
         return;
     }
 
+    status.textContent = 'Measuring Bandwidth...';
     try {
-        const response = await sendLatency(latitude, longitude, accuracy, ping_ms);
-        
-        if (response.ok) {
-            status.textContent = 'Data sent successfully.';
-            status.style.color = '#2e7d52';
-            result.textContent = `Latency: ${ping_ms} ms  (HTTP ${response.status})`;
-            result.style.color = '#2e7d52';
-        } else {
-            const serverErrText = await response.text();
-            status.textContent = `Server Internal Error (${response.status}).`;
+        mbps = await measureBandwidth();
+
+        const bandwidthResponse = await sendBandwidth(latitude, longitude, ping_ms, mbps);
+
+        if (!bandwidthResponse.ok) {
+            const serverErrText = await bandwidthResponse.text();
+            status.textContent = `Server Internal Error (${bandwidthResponse.status}).`;
             status.style.color = '#c0392b';
             result.textContent = `DB Error Logs: ${serverErrText}`;
             result.style.color = '#c0392b';
+            button.disabled = false;
+            return;
         }
-    } 
+
+        status.textContent = 'Data sent successfully.';
+        status.style.color = '#2e7d52';
+        result.textContent = `Latency: ${ping_ms} ms | Bandwidth: ${mbps.toFixed(2)} Mbps (HTTP ${bandwidthResponse.status})`;
+        result.style.color = '#2e7d52';
+    }
     catch (err) {
-        status.textContent = 'POST failed.';
+        status.textContent = 'Bandwidth measurement/POST failed.';
         status.style.color = '#c0392b';
         result.textContent = `Details: ${err.message}`;
         result.style.color = '#c0392b';

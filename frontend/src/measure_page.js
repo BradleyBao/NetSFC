@@ -50,9 +50,9 @@ function success(position) {
     document.getElementById('status').textContent   = 'Location acquired.';
     document.getElementById('button_locate').disabled = false;
 
-    const latencyButton = document.getElementById('button_latency');
-    const latencyStatus = document.getElementById('latency_status');
-    const latencyResult = document.getElementById('latency_result');
+    const networkButton = document.getElementById('button_network');
+    const networkStatus = document.getElementById('network_status');
+    const networkResult = document.getElementById('network_result');
 
     if (boundCheck(latitude, longitude)) {
         setStatus('Location acquired.', 'success');
@@ -66,10 +66,7 @@ function success(position) {
 
         if (latencyButton) {
             latencyButton.style.display = 'inline-block';
-        }
-        if (latencyStatus) {
-            latencyStatus.textContent = 'You are in SFC campus, you can now run the network latency test.';
-            latencyStatus.style.color = '#2e7d52'; 
+            latencyButton.onclick = checkLatency;
         }
     }
 
