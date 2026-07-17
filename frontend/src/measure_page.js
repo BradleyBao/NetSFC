@@ -64,9 +64,9 @@ function success(position) {
         localStorage.setItem('longitude', longitude);
         localStorage.setItem('accuracy', accuracy); 
 
-        if (latencyButton) {
-            latencyButton.style.display = 'inline-block';
-            latencyButton.onclick = checkLatency;
+        if (networkButton) {
+            networkButton.style.display = 'inline-block';
+            networkButton.onclick = checkLatency;
         }
     }
 
@@ -76,15 +76,15 @@ function success(position) {
         document.getElementById('heatmap-link').style.display = 'none';
         document.getElementById('bounds-status').textContent = 'Map access denied: You must be on SFC Campus to access the map.';
 
-        if (latencyButton) {
-            latencyButton.style.display = 'none';
+        if (networkButton) {
+            // networkButton.style.display = 'none';
         }
-        if (latencyStatus) {
-            latencyStatus.textContent = 'Latency test restricted: You must be on SFC Campus to measure network speed.';
-            latencyStatus.style.color = '#c0392b'; 
+        if (networkStatus) {
+            networkStatus.textContent = 'Latency test restricted: You must be on SFC Campus to measure network speed.';
+            networkStatus.style.color = '#c0392b'; 
         }
-        if (latencyResult) {
-            latencyResult.textContent = '';
+        if (networkResult) {
+            networkResult.textContent = '';
         }
     }
 }

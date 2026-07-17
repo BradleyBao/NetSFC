@@ -49,24 +49,24 @@ async function sendLatency(latitude, longitude, accuracy, ping_ms) {
     return response;
 }
 
-async function measureBandwidth(latitude, longitude, sizeBytes = 2_000_000) {
+async function measureAndSendBandwidth(latitude, longitude, ping_ms, sizeBytes = 2_000_000) {
     const padding = 'x'.repeat(sizeBytes);
 
-    const mockPayload = {
+    const info = {
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
         signal: 3.0,
         signal_strength: 3.0,
-        ping_ms: 1.0,
+        ping_ms: parseFloat(ping_ms),
         _padding: padding,
     };
 
-    const body = JSON.stringify(mockPayload);
+    const body = JSON.stringify(info);
     const actualBytes = new Blob([body]).size;
 
     const t1 = Date.now();
 
-    await fetch(`${API_HOST}/api/measurements`, {
+    const response = await fetch(`${API_HOST}/api/measurements`, {
         method: 'POST',
         cache: 'no-store',
         headers: { 'Content-Type': 'application/json' },
@@ -76,33 +76,7 @@ async function measureBandwidth(latitude, longitude, sizeBytes = 2_000_000) {
     const seconds = (Date.now() - t1) / 1000;
     const mbps = (actualBytes * 8 / seconds) / 1_000_000;
 
-    return mbps;
-}
-
-async function sendBandwidth(latitude, longitude, ping_ms, mbps) {
-    const parsedLat = parseFloat(latitude);
-    const parsedLon = parseFloat(longitude);
-    const parsedPing = parseFloat(ping_ms);
-    const parsedMbps = parseFloat(mbps);
-    let signalScore = 3.0; 
-
-    const info = {
-        latitude: parsedLat,
-        longitude: parsedLon,
-        signal: signalScore,
-        signal_strength: signalScore,
-        ping_ms: parsedPing,
-        bandwidth_mbps: parsedMbps,
-    };
-
-    const response = await fetch(`${API_HOST}/api/measurements`, {
-        method: 'POST',
-        cache: 'no-store',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(info)
-    });
-
-    return response;
+    return { response, mbps };
 }
 
 async function checkNetwork() {
@@ -150,9 +124,8 @@ async function checkNetwork() {
 
     status.textContent = 'Measuring Bandwidth...';
     try {
-        mbps = await measureBandwidth();
-
-        const bandwidthResponse = await sendBandwidth(latitude, longitude, ping_ms, mbps);
+        const { response: bandwidthResponse, mbps: measuredMbps } = await measureAndSendBandwidth(latitude, longitude, ping_ms);
+        mbps = measuredMbps;
 
         if (!bandwidthResponse.ok) {
             const serverErrText = await bandwidthResponse.text();

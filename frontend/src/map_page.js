@@ -30,6 +30,7 @@ window.onload = function() {
         minZoom: MAP_CONFIG.minZoom,
         maxZoom: MAP_CONFIG.maxZoom,
 
+        zoomControl: false,
         zoomAnimation: true,
         fadeAnimation: true,
         markerZoomAnimation: true,
@@ -41,6 +42,10 @@ window.onload = function() {
         inertiaDeceleration: 2000,
         inertiaMaxSpeed: 1500,
     });
+
+    L.control.zoom({
+        position: 'bottomright'
+    }).addTo(map);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
