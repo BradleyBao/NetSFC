@@ -89,6 +89,7 @@ function placePOIs(items) {
             return;
         }
 
+        // Handle Items
         if (item.coords.length === 2 && typeof item.coords[0] === 'number' && typeof item.coords[1] === 'number') {
             const icon = POI_ICONS[item.layer_type] || '📍';
             const labelText = item.name || item.layer_type.replace(/_/g, ' ');
@@ -118,11 +119,123 @@ function placePOIs(items) {
                 });
             return;
         }
+        
+        // Handle Buildings
+        if (item.coords.length > 2 && Array.isArray(item.coords[0])) {
+            const labelText = item.name || item.layer_type.replace(/_/g, ' ');
 
-        // TODO: support building or room polygons when coords is an array of multiple [lat, lon] points
-        console.log('TODO: support polygon coords for building shapes', item);
+            const polygon = L.polygon(item.coords, {
+                color: '#3388ff',
+                weight: 2,
+                fillOpacity: 0.25,
+                interactive: true
+            }).addTo(map);
+
+            polygon.bindTooltip(labelText, { direction: 'top', opacity: 0.85 });
+
+            polygon.on('click', () => openBuildingPanel(item));
+            polygon.on('mouseover', () => polygon.setStyle({ fillOpacity: 0.45 }));
+            polygon.on('mouseout', () => polygon.setStyle({ fillOpacity: 0.25 }));
+
+            return;
+        }
+
+        console.log('TODO: unsupported coords shape', item);
     });
 }
+
+let currentBuildingFloors = [];
+
+function openBuildingPanel(item) {
+    document.getElementById('building-panel-name').textContent = item.name || 'Unnamed building';
+    document.getElementById('building-panel-description').textContent = item.description || '';
+
+    currentBuildingFloors = item.floors || [];
+
+    const tabsContainer = document.getElementById('building-floor-tabs');
+    tabsContainer.innerHTML = '';
+
+    if (currentBuildingFloors.length === 0) {
+        document.getElementById('building-panel-classrooms').innerHTML = '';
+        document.getElementById('building-panel-items').innerHTML = '';
+    } else {
+        currentBuildingFloors.forEach((floor, index) => {
+            const tab = document.createElement('button');
+            tab.className = 'building-floor-tab' + (index === 0 ? ' active' : '');
+            tab.textContent = floor.label || `Floor ${floor.level}`;
+            tab.addEventListener('click', () => selectFloor(index));
+            tabsContainer.appendChild(tab);
+        });
+        renderFloorContent(currentBuildingFloors[0]);
+    }
+
+    document.getElementById('building-panel').classList.add('open');
+}
+
+function selectFloor(index) {
+    const tabs = document.querySelectorAll('.building-floor-tab');
+    tabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
+    renderFloorContent(currentBuildingFloors[index]);
+}
+
+function renderFloorContent(floor) {
+    const classroomsEl = document.getElementById('building-panel-classrooms');
+    const itemsEl = document.getElementById('building-panel-items');
+
+    classroomsEl.innerHTML = (floor.classrooms || [])
+        .map(c => `<li>${c}</li>`).join('') || '<li style="color:#999;">None listed</li>';
+
+    itemsEl.innerHTML = (floor.items || [])
+        .map(i => `<li>${i}</li>`).join('') || '<li style="color:#999;">None listed</li>';
+}
+
+document.getElementById('building-panel-close').addEventListener('click', () => {
+    document.getElementById('building-panel').classList.remove('open');
+});
+
+// TEMP: force panel open with sample data for debugging
+document.addEventListener('DOMContentLoaded', () => {
+    // wait a tick to be sure `map` is initialized elsewhere in your app
+    setTimeout(() => {
+        const center = map.getCenter(); // uses wherever your map is already centered
+        const offset = 0.0007; // roughly a small building's footprint
+
+        const debugBuilding = {
+            name: "Wilson Library (debug)",
+            description: "Sample building shown by default for panel debugging.",
+            layer_type: "building",
+            coords: [
+                [center.lat - offset, center.lng - offset],
+                [center.lat - offset, center.lng + offset],
+                [center.lat + offset, center.lng + offset],
+                [center.lat + offset, center.lng - offset]
+            ],
+            floors: [
+                {
+                    level: 1,
+                    label: "1st Floor",
+                    classrooms: ["Reading Room A", "Reading Room B", "Info Desk"],
+                    items: ["Printers (x4)", "Water fountain", "Lockers"]
+                },
+                {
+                    level: 2,
+                    label: "2nd Floor",
+                    classrooms: ["Study Room 201", "Study Room 202", "Quiet Zone"],
+                    items: ["Vending machine"]
+                }
+            ]
+        };
+
+        try {
+            placePOIs([debugBuilding]);
+        } catch (err) {
+            console.error('placePOIs failed:', err);
+        }
+
+        // panel opens regardless of whether the polygon drew successfully
+        openBuildingPanel(debugBuilding);
+    }, 300);
+});
 
 function placeMarker(lat, long, acc) {
     if (currentMarker) map.removeLayer(currentMarker);
