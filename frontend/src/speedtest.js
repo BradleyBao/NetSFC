@@ -89,6 +89,13 @@ async function checkNetwork() {
     const longitude = localStorage.getItem('longitude');
     const accuracy = localStorage.getItem('accuracy');
 
+    if (!latitude || !longitude) {
+        status.textContent = 'Location must be measured first to measure network';
+        status.style.color = '#c0392b';
+        result.textContent = '';
+        return;
+    }
+
     button.disabled = true;
     result.textContent = '';
     result.style.color = '#1a1a1a';

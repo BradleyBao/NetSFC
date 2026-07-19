@@ -2,7 +2,7 @@
   {
     "id": 2,
     "name": "Men's Washroom - Alpha Building 2F",
-    "type": "washroom",
+    "layer_type": "washroom",
     "building": "Alpha Building",
     "floor": "2F",
     "coords": [
@@ -13,7 +13,7 @@
   {
     "id": 3,
     "name": "Women's Washroom - Alpha Building 2F",
-    "type": "washroom",
+    "layer_type": "washroom",
     "building": "Alpha Building",
     "floor": "2F",
     "coords": [
@@ -24,7 +24,7 @@
   {
     "id": 4,
     "name": "Garbage Cans - Alpha Building 2F",
-    "type": "garbage",
+    "layer_type": "garbage",
     "building": "Alpha Building",
     "floor": "2F",
     "coords": [
@@ -35,7 +35,7 @@
   {
     "id": 5,
     "name": "Garbage Cans - Omicron Building 1F",
-    "type": "garbage",
+    "layer_type": "garbage",
     "building": "Omicron Building",
     "floor": "1F",
     "coords": [
@@ -46,7 +46,7 @@
   {
     "id": 6,
     "name": "Men's Washroom - Omicron Building 1F (Front)",
-    "type": "washroom",
+    "layer_type": "washroom",
     "building": "Omicron Building",
     "floor": "1F",
     "coords": [
@@ -57,7 +57,7 @@
   {
     "id": 7,
     "name": "Women's Washroom - Omicron Building 1F (Front)",
-    "type": "washroom",
+    "layer_type": "washroom",
     "building": "Omicron Building",
     "floor": "1F",
     "coords": [
@@ -68,7 +68,7 @@
   {
     "id": 8,
     "name": "Garbage Cans - Omicron Building 2F (Front)",
-    "type": "garbage",
+    "layer_type": "garbage",
     "building": "Omicron Building",
     "floor": "2F",
     "coords": [
@@ -79,7 +79,7 @@
   {
     "id": 9,
     "name": "Printer - Omicron Building (Back)",
-    "type": "printer",
+    "layer_type": "printer",
     "building": "Omicron Building",
     "floor": "1F",
     "coords": [
@@ -90,7 +90,7 @@
   {
     "id": 10,
     "name": "Garbage Cans - Omicron Building (Back)",
-    "type": "garbage",
+    "layer_type": "garbage",
     "building": "Omicron Building",
     "floor": "1F",
     "coords": [
@@ -101,7 +101,7 @@
   {
     "id": 11,
     "name": "Women's Washroom - Omicron Building (Back)",
-    "type": "washroom",
+    "layer_type": "washroom",
     "building": "Omicron Building",
     "floor": "1F",
     "coords": [
@@ -112,7 +112,7 @@
   {
     "id": 12,
     "name": "Accessible Washroom - Omicron Building (Back)",
-    "type": "accessible_washroom",
+    "layer_type": "accessible_washroom",
     "building": "Omicron Building",
     "floor": "1F",
     "coords": [
@@ -123,7 +123,7 @@
   {
     "id": 13,
     "name": "Men's Washroom - Omicron Building (Back)",
-    "type": "washroom",
+    "layer_type": "washroom",
     "building": "Omicron Building",
     "floor": "1F",
     "coords": [
@@ -134,7 +134,7 @@
   {
     "id": 14,
     "name": "Garbage Cans - Omicron Building 2F (Back)",
-    "type": "garbage",
+    "layer_type": "garbage",
     "building": "Omicron Building",
     "floor": "2F",
     "coords": [
@@ -145,7 +145,7 @@
   {
     "id": 15,
     "name": "Elevator - Omicron Building 2F (Back)",
-    "type": "elevator",
+    "layer_type": "elevator",
     "building": "Omicron Building",
     "floor": "2F",
     "coords": [
@@ -156,7 +156,7 @@
   {
     "id": 16,
     "name": "Printer - Epsilon Building 1F (Back)",
-    "type": "printer",
+    "layer_type": "printer",
     "building": "Epsilon Building",
     "floor": "1F",
     "coords": [
@@ -167,7 +167,7 @@
   {
     "id": 17,
     "name": "Water Fountain - Kappa Building 1F (Front)",
-    "type": "water_fountain",
+    "layer_type": "water_fountain",
     "building": "Kappa Building",
     "floor": "1F",
     "coords": [
@@ -178,7 +178,7 @@
   {
     "id": 18,
     "name": "Water Fountain - Sigma Building Lounge B1F",
-    "type": "water_fountain",
+    "layer_type": "water_fountain",
     "building": "Sigma Building",
     "floor": "B1F",
     "coords": [
@@ -189,12 +189,78 @@
   {
     "id": 19,
     "name": "Printer - Sigma Building Cafeteria",
-    "type": "printer",
+    "layer_type": "printer",
     "building": "Sigma Building",
     "floor": "1F",
     "coords": [
       35.387222,
       139.426528
+    ]
+  },
+  {
+    "id": 20,
+    "name": "Kappa Building",
+    "layer_type": "polygon",
+    "building": "Kappa Building",
+    "floor": "",
+    "coords": [
+      [
+        35.3877367,
+        139.4266289
+      ],
+      [
+        35.387542,
+        139.4265946
+        
+      ],
+      [
+        35.3875674,
+        139.42636
+        
+      ],
+      [
+        35.3877284,
+        139.4263948
+        
+      ],
+      [
+        35.3877479,
+        139.4262816
+        
+      ],
+      [
+        35.3876024,
+        139.4262567
+        
+      ],
+      [
+        35.3876403,
+        139.4259884
+      ],
+      [
+        35.3878338,
+        139.426029
+      ],
+      [
+        35.3877913,
+        139.4262943
+      ],
+      [
+        35.3877675,
+        139.4262863
+      ],
+      [
+        35.3877507,
+        139.4264031
+      ],
+      [
+        35.3877689,
+        139.4264063
+      ],
+      [
+        35.3877367,
+        139.4266289
+      ]
     ]
   }
 ]

@@ -4,8 +4,8 @@
 const MAP_CONFIG = {
     center: [35.3883, 139.4283], // default center, SFC campus
     zoom: 17,
-    minZoom: 3,
-    maxZoom: 21,
+    minZoom: 10,
+    maxZoom: 19,
 }
 
 const POI_ICONS = {
@@ -15,6 +15,7 @@ const POI_ICONS = {
     water_fountain: '💧',
     elevator: '🛗',
     accessible_washroom: '♿',
+    building: '🏢'
 };
 
 let map;
@@ -66,16 +67,18 @@ window.onload = function() {
 };
 
 function loadPOIs() {
-    const url = `${window.ENV.API_HOST}/api/pois`;
-    fetch(url)
+    // const url = `${window.ENV.API_HOST}/api/pois`;
+    fetch("/data/facilities.json")
         .then(response => {
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);
             }
             return response.json();
         })
-        .then(items => {
-            placePOIs(items);
+        .then(facilities => {
+            const { buildingItems, pointItems } = transformFacilities(facilities);
+            placePOIs(buildingItems);
+            placePOIs(pointItems);
         })
         .catch(error => {
             console.error('Failed to load POIs', error);
@@ -103,9 +106,9 @@ function placePOIs(items) {
             const poiIcon = L.divIcon({
                 html,
                 className: 'poi-div-icon',
-                iconSize: [180, 34],
-                iconAnchor: [10, 18],
-                popupAnchor: [0, -18],
+                iconSize: [120, 34],
+                iconAnchor: [8, 12],
+                popupAnchor: [0, -12],
             });
 
             L.marker([item.coords[0], item.coords[1]], { icon: poiIcon, interactive: true })
@@ -133,15 +136,51 @@ function placePOIs(items) {
 
             polygon.bindTooltip(labelText, { direction: 'top', opacity: 0.85 });
 
-            polygon.on('click', () => openBuildingPanel(item));
+            const handleBuildingClick = (event) => {
+                if (event.originalEvent) L.DomEvent.stopPropagation(event);
+                openBuildingPanel(item);
+                map.flyToBounds(polygon.getBounds(), { padding: [60, 60], duration: 0.5, maxZoom: 19 });
+            };
+
+            polygon.on('click', handleBuildingClick);
             polygon.on('mouseover', () => polygon.setStyle({ fillOpacity: 0.45 }));
             polygon.on('mouseout', () => polygon.setStyle({ fillOpacity: 0.25 }));
+
+            const icon = POI_ICONS['building'] || '📍';
+            const html = `
+                <div class="poi-label">
+                    <span class="poi-icon">${icon}</span>
+                    <span class="poi-title">${labelText}</span>
+                </div>
+            `;
+            const buildingIcon = L.divIcon({
+                html,
+                className: 'poi-div-icon',
+                iconSize: [120, 24],
+                iconAnchor: [60, 12],
+                popupAnchor: [0, -12],
+            });
+
+            const centroid = getPolygonCentroid(item.coords);
+            L.marker(centroid, { icon: buildingIcon, interactive: true })
+                .addTo(map)
+                .on('click', handleBuildingClick);
 
             return;
         }
 
         console.log('TODO: unsupported coords shape', item);
     });
+}
+
+function getPolygonCentroid(coords) {
+    const total = coords.reduce((acc, [lat, lng]) => {
+        acc.lat += lat;
+        acc.lng += lng;
+        return acc;
+    }, { lat: 0, lng: 0 });
+
+    return [total.lat / coords.length, total.lng / coords.length];
 }
 
 let currentBuildingFloors = [];
@@ -193,49 +232,46 @@ document.getElementById('building-panel-close').addEventListener('click', () => 
     document.getElementById('building-panel').classList.remove('open');
 });
 
-// TEMP: force panel open with sample data for debugging
-document.addEventListener('DOMContentLoaded', () => {
-    // wait a tick to be sure `map` is initialized elsewhere in your app
-    setTimeout(() => {
-        const center = map.getCenter(); // uses wherever your map is already centered
-        const offset = 0.0007; // roughly a small building's footprint
+function transformFacilities(facilities) {
+    const buildingPolygons = facilities.filter(f => f.layer_type === 'polygon');
+    const pointFacilities = facilities.filter(f => f.layer_type !== 'polygon');
 
-        const debugBuilding = {
-            name: "Wilson Library (debug)",
-            description: "Sample building shown by default for panel debugging.",
-            layer_type: "building",
-            coords: [
-                [center.lat - offset, center.lng - offset],
-                [center.lat - offset, center.lng + offset],
-                [center.lat + offset, center.lng + offset],
-                [center.lat + offset, center.lng - offset]
-            ],
-            floors: [
-                {
-                    level: 1,
-                    label: "1st Floor",
-                    classrooms: ["Reading Room A", "Reading Room B", "Info Desk"],
-                    items: ["Printers (x4)", "Water fountain", "Lockers"]
-                },
-                {
-                    level: 2,
-                    label: "2nd Floor",
-                    classrooms: ["Study Room 201", "Study Room 202", "Quiet Zone"],
-                    items: ["Vending machine"]
-                }
-            ]
+    // Group point facilities by building -> floor -> [item names]
+    const groupedByBuilding = {};
+    pointFacilities.forEach(f => {
+        if (!f.building) return;
+        if (!groupedByBuilding[f.building]) groupedByBuilding[f.building] = {};
+        const floorKey = f.floor || 'Unspecified';
+        if (!groupedByBuilding[f.building][floorKey]) groupedByBuilding[f.building][floorKey] = [];
+        groupedByBuilding[f.building][floorKey].push(f.name);
+    });
+
+    // Building polygons -> match placePOIs' expected shape
+    const buildingItems = buildingPolygons.map(poly => {
+        const coords = poly.coords;
+
+        const floorMap = groupedByBuilding[poly.building] || {};
+        const floors = Object.keys(floorMap).map(floorLabel => ({
+            level: floorLabel,
+            label: floorLabel,
+            classrooms: [],
+            items: floorMap[floorLabel]
+        }));
+
+        return {
+            layer_type: 'building', // note: still renamed here, so placePOIs' polygon-icon fallback text reads correctly
+            name: poly.name,
+            description: poly.description || '',
+            coords: coords,
+            floors: floors
         };
+    });
 
-        try {
-            placePOIs([debugBuilding]);
-        } catch (err) {
-            console.error('placePOIs failed:', err);
-        }
+    // Point facilities -> already have layer_type, coords already [lat, lng]
+    const pointItems = pointFacilities.filter(f => f.coords); 
 
-        // panel opens regardless of whether the polygon drew successfully
-        openBuildingPanel(debugBuilding);
-    }, 300);
-});
+    return { buildingItems, pointItems };
+}
 
 function placeMarker(lat, long, acc) {
     if (currentMarker) map.removeLayer(currentMarker);
