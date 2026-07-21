@@ -4,8 +4,8 @@
 const MAP_CONFIG = {
     center: [35.3883, 139.4283], // default center, SFC campus
     zoom: 17,
-    minZoom: 3,
-    maxZoom: 21,
+    minZoom: 10,
+    maxZoom: 19,
 }
 
 const POI_ICONS = {
@@ -15,6 +15,7 @@ const POI_ICONS = {
     water_fountain: '💧',
     elevator: '🛗',
     accessible_washroom: '♿',
+    building: '🏢'
 };
 
 let map;
@@ -30,6 +31,7 @@ window.onload = function() {
         minZoom: MAP_CONFIG.minZoom,
         maxZoom: MAP_CONFIG.maxZoom,
 
+        zoomControl: false,
         zoomAnimation: true,
         fadeAnimation: true,
         markerZoomAnimation: true,
@@ -41,6 +43,10 @@ window.onload = function() {
         inertiaDeceleration: 2000,
         inertiaMaxSpeed: 1500,
     });
+
+    L.control.zoom({
+        position: 'bottomright'
+    }).addTo(map);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -62,15 +68,17 @@ window.onload = function() {
 
 function loadPOIs() {
     const url = `${window.ENV.API_HOST}/api/pois`;
-    fetch(url)
+    fetch(url)  // Used local file for testing purposes, should work when server is updated ("/data/facilities.json")
         .then(response => {
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);
             }
             return response.json();
         })
-        .then(items => {
-            placePOIs(items);
+        .then(facilities => {
+            const { buildingItems, pointItems } = transformFacilities(facilities);
+            placePOIs(buildingItems);
+            placePOIs(pointItems);
         })
         .catch(error => {
             console.error('Failed to load POIs', error);
@@ -84,6 +92,7 @@ function placePOIs(items) {
             return;
         }
 
+        // Handle Items
         if (item.coords.length === 2 && typeof item.coords[0] === 'number' && typeof item.coords[1] === 'number') {
             const icon = POI_ICONS[item.layer_type] || '📍';
             const labelText = item.name || item.layer_type.replace(/_/g, ' ');
@@ -97,9 +106,9 @@ function placePOIs(items) {
             const poiIcon = L.divIcon({
                 html,
                 className: 'poi-div-icon',
-                iconSize: [180, 34],
-                iconAnchor: [10, 18],
-                popupAnchor: [0, -18],
+                iconSize: [100, 24],
+                iconAnchor: [8, 12],
+                popupAnchor: [0, -12],
             });
 
             L.marker([item.coords[0], item.coords[1]], { icon: poiIcon, interactive: true })
@@ -113,10 +122,179 @@ function placePOIs(items) {
                 });
             return;
         }
+        
+        // Handle Buildings
+        if (item.coords.length > 2 && Array.isArray(item.coords[0])) {
+            const labelText = item.name || item.layer_type.replace(/_/g, ' ');
 
-        // TODO: support building or room polygons when coords is an array of multiple [lat, lon] points
-        console.log('TODO: support polygon coords for building shapes', item);
+            const polygon = L.polygon(item.coords, {
+                color: '#3388ff',
+                weight: 2,
+                fillOpacity: 0.25,
+                interactive: true
+            }).addTo(map);
+
+            polygon.bindTooltip(labelText, { direction: 'top', opacity: 0.85 });
+
+            const handleBuildingClick = (event) => {
+                if (event.originalEvent) L.DomEvent.stopPropagation(event);
+                openBuildingPanel(item);
+                map.flyToBounds(polygon.getBounds(), { padding: [60, 60], duration: 0.5, maxZoom: 19 });
+            };
+
+            polygon.on('click', handleBuildingClick);
+            polygon.on('mouseover', () => polygon.setStyle({ fillOpacity: 0.45 }));
+            polygon.on('mouseout', () => polygon.setStyle({ fillOpacity: 0.25 }));
+
+            const icon = POI_ICONS['building'] || '📍';
+            const html = `
+                <div class="poi-label">
+                    <span class="poi-icon">${icon}</span>
+                    <span class="poi-title">${labelText}</span>
+                </div>
+            `;
+            const buildingIcon = L.divIcon({
+                html,
+                className: 'poi-div-icon',
+                iconSize: [100, 24],
+                iconAnchor: [60, 12],
+                popupAnchor: [0, -12],
+            });
+
+            const centroid = getPolygonCentroid(item.coords);
+            L.marker(centroid, { icon: buildingIcon, interactive: true })
+                .addTo(map)
+                .on('click', handleBuildingClick);
+
+            return;
+        }
+
+        console.log('TODO: unsupported coords shape', item);
     });
+}
+
+function getPolygonCentroid(coords) {
+    const total = coords.reduce((acc, [lat, lng]) => {
+        acc.lat += lat;
+        acc.lng += lng;
+        return acc;
+    }, { lat: 0, lng: 0 });
+
+    return [total.lat / coords.length, total.lng / coords.length];
+}
+
+let currentBuildingFloors = [];
+
+function openBuildingPanel(item) {
+    document.getElementById('building-panel-name').textContent = item.name || 'Unnamed building';
+    document.getElementById('building-panel-description').textContent = item.description || '';
+
+    currentBuildingFloors = item.floors || [];
+
+    const tabsContainer = document.getElementById('building-floor-tabs');
+    tabsContainer.innerHTML = '';
+
+    if (currentBuildingFloors.length === 0) {
+        document.getElementById('building-panel-classrooms').innerHTML = '';
+        document.getElementById('building-panel-items').innerHTML = '';
+    } else {
+        currentBuildingFloors.forEach((floor, index) => {
+            const tab = document.createElement('button');
+            tab.className = 'building-floor-tab' + (index === 0 ? ' active' : '');
+            tab.textContent = floor.label || `Floor ${floor.level}`;
+            tab.addEventListener('click', () => selectFloor(index));
+            tabsContainer.appendChild(tab);
+        });
+        renderFloorContent(currentBuildingFloors[0]);
+    }
+
+    document.getElementById('building-panel').classList.add('open');
+}
+
+function selectFloor(index) {
+    const tabs = document.querySelectorAll('.building-floor-tab');
+    tabs.forEach((tab, i) => tab.classList.toggle('active', i === index));
+    renderFloorContent(currentBuildingFloors[index]);
+}
+
+function renderFloorContent(floor) {
+    const classroomsEl = document.getElementById('building-panel-classrooms');
+    const itemsEl = document.getElementById('building-panel-items');
+
+    classroomsEl.innerHTML = (floor.classrooms || [])
+        .map(c => `<li>${c}</li>`).join('') || '<li style="color:#999;">None listed</li>';
+
+    itemsEl.innerHTML = (floor.items || [])
+        .map(i => `<li>${i}</li>`).join('') || '<li style="color:#999;">None listed</li>';
+}
+
+document.getElementById('building-panel-close').addEventListener('click', () => {
+    document.getElementById('building-panel').classList.remove('open');
+});
+
+function transformFacilities(facilities) {
+    const buildingPolygons = facilities.filter(f => f.layer_type === 'polygon');
+    const pointFacilities = facilities.filter(f => f.layer_type !== 'polygon');
+
+    // Group point facilities by building -> floor -> [item names]
+    const groupedByBuilding = {};
+    pointFacilities.forEach(f => {
+        if (!f.building) return;
+        if (!groupedByBuilding[f.building]) groupedByBuilding[f.building] = {};
+        const floorKey = f.floor || 'Unspecified';
+        if (!groupedByBuilding[f.building][floorKey]) groupedByBuilding[f.building][floorKey] = [];
+        groupedByBuilding[f.building][floorKey].push(f.name);
+    });
+
+    // Building polygons -> match placePOIs' expected shape
+    const buildingItems = buildingPolygons.map(poly => {
+        const coords = poly.coords;
+
+        const floorMap = groupedByBuilding[poly.building] || {};
+
+        let declaredFloors = [];
+        if (poly.floor) {
+            const rawParts = poly.floor.split(',');
+            for (let i = 0; i < rawParts.length; i++) {
+                const trimmed = rawParts[i].trim();
+                if (trimmed !== '') {
+                    declaredFloors.push(trimmed);
+                }
+            }
+        }
+
+        const floorLabels = [];
+        for (let i = 0; i < declaredFloors.length; i++) {
+            if (!floorLabels.includes(declaredFloors[i])) {
+                floorLabels.push(declaredFloors[i]);
+            }
+        }
+        const facilityFloors = Object.keys(floorMap);
+        for (let i = 0; i < facilityFloors.length; i++) {
+            if (!floorLabels.includes(facilityFloors[i])) {
+                floorLabels.push(facilityFloors[i]);
+            }
+        }
+
+        const floors = floorLabels.map(floorLabel => ({
+            level: floorLabel,
+            label: floorLabel,
+            classrooms: [],
+            items: floorMap[floorLabel] || []
+        }));
+
+        return {
+            layer_type: 'building', 
+            name: poly.name,
+            description: poly.description || '',
+            coords: coords,
+            floors: floors
+        };
+    });
+
+    const pointItems = pointFacilities.filter(f => f.coords); 
+
+    return { buildingItems, pointItems };
 }
 
 function placeMarker(lat, long, acc) {

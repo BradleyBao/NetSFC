@@ -50,9 +50,9 @@ function success(position) {
     document.getElementById('status').textContent   = 'Location acquired.';
     document.getElementById('button_locate').disabled = false;
 
-    const latencyButton = document.getElementById('button_latency');
-    const latencyStatus = document.getElementById('latency_status');
-    const latencyResult = document.getElementById('latency_result');
+    const networkButton = document.getElementById('button_network');
+    const networkStatus = document.getElementById('network_status');
+    const networkResult = document.getElementById('network_result');
 
     if (boundCheck(latitude, longitude)) {
         setStatus('Location acquired.', 'success');
@@ -64,12 +64,9 @@ function success(position) {
         localStorage.setItem('longitude', longitude);
         localStorage.setItem('accuracy', accuracy); 
 
-        if (latencyButton) {
-            latencyButton.style.display = 'inline-block';
-        }
-        if (latencyStatus) {
-            latencyStatus.textContent = 'You are in SFC campus, you can now run the network latency test.';
-            latencyStatus.style.color = '#2e7d52'; 
+        if (networkButton) {
+            networkButton.style.display = 'inline-block';
+            networkButton.onclick = checkNetwork;
         }
     }
 
@@ -79,15 +76,15 @@ function success(position) {
         document.getElementById('heatmap-link').style.display = 'none';
         document.getElementById('bounds-status').textContent = 'Map access denied: You must be on SFC Campus to access the map.';
 
-        if (latencyButton) {
-            latencyButton.style.display = 'none';
+        if (networkButton) {
+            networkButton.style.display = 'none';
         }
-        if (latencyStatus) {
-            latencyStatus.textContent = 'Latency test restricted: You must be on SFC Campus to measure network speed.';
-            latencyStatus.style.color = '#c0392b'; 
+        if (networkStatus) {
+            networkStatus.textContent = 'Latency test restricted: You must be on SFC Campus to measure network speed.';
+            networkStatus.style.color = '#c0392b'; 
         }
-        if (latencyResult) {
-            latencyResult.textContent = '';
+        if (networkResult) {
+            networkResult.textContent = '';
         }
     }
 }
