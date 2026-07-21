@@ -67,8 +67,8 @@ window.onload = function() {
 };
 
 function loadPOIs() {
-    // const url = `${window.ENV.API_HOST}/api/pois`;
-    fetch("/data/facilities.json")
+    const url = `${window.ENV.API_HOST}/api/pois`;
+    fetch(url)  // Used local file for testing purposes, should work when server is updated ("/data/facilities.json")
         .then(response => {
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);
@@ -106,7 +106,7 @@ function placePOIs(items) {
             const poiIcon = L.divIcon({
                 html,
                 className: 'poi-div-icon',
-                iconSize: [120, 34],
+                iconSize: [100, 24],
                 iconAnchor: [8, 12],
                 popupAnchor: [0, -12],
             });
@@ -156,7 +156,7 @@ function placePOIs(items) {
             const buildingIcon = L.divIcon({
                 html,
                 className: 'poi-div-icon',
-                iconSize: [120, 24],
+                iconSize: [100, 24],
                 iconAnchor: [60, 12],
                 popupAnchor: [0, -12],
             });
@@ -251,15 +251,40 @@ function transformFacilities(facilities) {
         const coords = poly.coords;
 
         const floorMap = groupedByBuilding[poly.building] || {};
-        const floors = Object.keys(floorMap).map(floorLabel => ({
+
+        let declaredFloors = [];
+        if (poly.floor) {
+            const rawParts = poly.floor.split(',');
+            for (let i = 0; i < rawParts.length; i++) {
+                const trimmed = rawParts[i].trim();
+                if (trimmed !== '') {
+                    declaredFloors.push(trimmed);
+                }
+            }
+        }
+
+        const floorLabels = [];
+        for (let i = 0; i < declaredFloors.length; i++) {
+            if (!floorLabels.includes(declaredFloors[i])) {
+                floorLabels.push(declaredFloors[i]);
+            }
+        }
+        const facilityFloors = Object.keys(floorMap);
+        for (let i = 0; i < facilityFloors.length; i++) {
+            if (!floorLabels.includes(facilityFloors[i])) {
+                floorLabels.push(facilityFloors[i]);
+            }
+        }
+
+        const floors = floorLabels.map(floorLabel => ({
             level: floorLabel,
             label: floorLabel,
             classrooms: [],
-            items: floorMap[floorLabel]
+            items: floorMap[floorLabel] || []
         }));
 
         return {
-            layer_type: 'building', // note: still renamed here, so placePOIs' polygon-icon fallback text reads correctly
+            layer_type: 'building', 
             name: poly.name,
             description: poly.description || '',
             coords: coords,
@@ -267,7 +292,6 @@ function transformFacilities(facilities) {
         };
     });
 
-    // Point facilities -> already have layer_type, coords already [lat, lng]
     const pointItems = pointFacilities.filter(f => f.coords); 
 
     return { buildingItems, pointItems };

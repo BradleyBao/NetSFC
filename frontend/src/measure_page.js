@@ -66,7 +66,7 @@ function success(position) {
 
         if (networkButton) {
             networkButton.style.display = 'inline-block';
-            networkButton.onclick = checkLatency;
+            networkButton.onclick = checkNetwork;
         }
     }
 
@@ -77,7 +77,7 @@ function success(position) {
         document.getElementById('bounds-status').textContent = 'Map access denied: You must be on SFC Campus to access the map.';
 
         if (networkButton) {
-            // networkButton.style.display = 'none';
+            networkButton.style.display = 'none';
         }
         if (networkStatus) {
             networkStatus.textContent = 'Latency test restricted: You must be on SFC Campus to measure network speed.';
