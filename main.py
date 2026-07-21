@@ -40,8 +40,8 @@ class POIResponse(BaseModel):
     layer_type: str
     building: str | None = None
     floor: str | None = None
-    latitude: float
-    longitude: float
+    latitude: float | None = None
+    longitude: float | None = None
     coords: list[Any]
 
 class ConnectionManager():
@@ -139,7 +139,7 @@ async def get_all_pois():
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         cursor.execute('''
-            SELECT id, name, layer_type, building, floor, latitude, longitude, coords
+            SELECT id, name, layer_type, building, floor, coords
             FROM campus_pois
         ''')
         rows = cursor.fetchall()
@@ -151,9 +151,7 @@ async def get_all_pois():
                 "layer_type": row[2],
                 "building": row[3],
                 "floor": row[4],
-                "latitude": row[5],
-                "longitude": row[6],
-                "coords": json.loads(row[7]) if row[7] else [row[5], row[6]],
+                "coords": json.loads(row[5]) if row[5] else None,
             }
             for row in rows
         ]

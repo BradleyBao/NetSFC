@@ -14,8 +14,6 @@ class Facility(TypedDict):
     name: str
     building: str | None
     floor: str | None
-    latitude: float
-    longitude: float
     coords: List[float]
 
 
@@ -34,7 +32,7 @@ def load_facilities_json() -> list[Facility]:
         item: dict[str, Any]
 
         id_value = item.get("id")
-        type_value = item.get("type")
+        type_value = item.get("layer_type")
         name_value = item.get("name")
         coords: List[float] | None = item.get("coords")
 
@@ -43,9 +41,9 @@ def load_facilities_json() -> list[Facility]:
             or not isinstance(type_value, str)
             or not isinstance(name_value, str)
             or not isinstance(coords, list)
-            or len(coords) != 2
+            # or len(coords) != 2
         ):
-            logger.warning("Skipping invalid facility: %s", item)
+            logger.warning(f"Skipping invalid facility: {item}")
             continue
 
         cleaned.append({
@@ -54,8 +52,6 @@ def load_facilities_json() -> list[Facility]:
             "name": name_value,
             "building": item.get("building"),
             "floor": item.get("floor"),
-            "latitude": float(coords[0]),
-            "longitude": float(coords[1]),
             "coords": coords,
         })
 
@@ -80,14 +76,15 @@ def init_db(db_name: str) -> None:
 
     logger.info(f"Initializing database: {db_name}...")
 
+    # TODO: Add bandwidth data
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS wifi_measurements (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-            latitude REAL NOT NULL,
-            longitude REAL NOT NULL,
             signal_strength INTEGER NOT NULL,
-            ping_ms REAL NOT NULL
+            ping_ms REAL NOT NULL,
+            bandwidth REAL NOT NULL,
+            coords TEXT NOT NULL
         )
     """)
 
@@ -98,8 +95,6 @@ def init_db(db_name: str) -> None:
             name TEXT NOT NULL,
             building TEXT,
             floor TEXT,
-            latitude REAL NOT NULL,
-            longitude REAL NOT NULL,
             coords TEXT NOT NULL
         )
     """)
@@ -113,16 +108,14 @@ def init_db(db_name: str) -> None:
     for facility in facilities:
         cursor.execute("""
             INSERT OR REPLACE INTO campus_pois 
-            (id, layer_type, name, building, floor, latitude, longitude, coords)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (id, layer_type, name, building, floor, coords)
+            VALUES (?, ?, ?, ?, ?, ?)
         """, (
             facility["id"],
             facility["layer_type"],
             facility["name"],
             facility["building"],
             facility["floor"],
-            facility["latitude"],
-            facility["longitude"],
             json.dumps(facility["coords"], ensure_ascii=False),
         ))
 

@@ -14,10 +14,10 @@
 - Payload (JSON)
 ```json
 {
-  "latitude": 35.388,
-  "longitude": 139.427,
   "signal": 4,
-  "ping_ms": 12.5
+  "ping_ms": 12.5,
+  "bandwidth": 100, // In mbps
+  "coords": [35.3881, 139.4272]
 }
 ```
 - Response: 201 Created
@@ -35,8 +35,6 @@
     "layer_type": "water_fountain",
     "building": "Delta Building",
     "floor": "1F",
-    "latitude": 35.3881,
-    "longitude": 139.4272,
     "coords": [35.3881, 139.4272]
   }
 ]
@@ -55,8 +53,6 @@
     "layer_type": "water_fountain",
     "building": "Delta Building",
     "floor": "1F",
-    "latitude": 35.3881,
-    "longitude": 139.4272,
     "coords": [35.3881, 139.4272]
   }
 ]
