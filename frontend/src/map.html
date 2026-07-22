@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
-  <title>Heatmap</title>
+  <title>SFC Network Heatmap</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -19,6 +19,7 @@
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
+
     #map { 
       width: 100vw; 
       height: 100vh; 
@@ -27,39 +28,197 @@
       left: 0;
       z-index: 1;
     }
+
     .floating-title {
       position: absolute;
       top: 16px;
       left: 16px;
-      background: white;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
       padding: 10px 16px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
       font-size: 16px;
       font-weight: 500;
       z-index: 10;
-      max-width: 300px;
+      max-width: 260px;
     }
     .floating-title h1 {
       margin: 0;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
+      color: #1d1d1f;
     }
     .floating-title a {
       display: inline-block;
-      margin-top: 4px;
-      font-size: 13px;
+      margin-top: 2px;
+      font-size: 12px;
       color: #1a73e8;
       text-decoration: none;
     }
-    .floating-title a:hover {
-      text-decoration: underline;
+    .floating-title a:hover { text-decoration: underline; }
+
+    .category-chips-bar {
+      position: absolute;
+      top: 16px;
+      left: 290px;
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      max-width: calc(100vw - 360px);
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .category-chips-bar::-webkit-scrollbar { display: none; }
+
+    .chip-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #3c4043;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+    .chip-btn:hover { background: #ffffff; transform: translateY(-1px); }
+    .chip-btn.active {
+      background: #1a73e8;
+      color: #ffffff;
+      border-color: #1a73e8;
+      box-shadow: 0 3px 10px rgba(26, 115, 232, 0.35);
     }
 
-    .poi-div-icon {
-      pointer-events: auto;
+    .floating-gear-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+      z-index: 10;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.15s ease;
+    }
+    .floating-gear-btn:hover { transform: rotate(45deg); background: #ffffff; }
+
+    .settings-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .settings-modal.open {
+      display: flex;
+      opacity: 1;
+    }
+    .settings-modal-content {
+      width: 90%;
+      max-width: 380px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px 24px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+      transform: scale(0.95);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .settings-modal.open .settings-modal-content {
+      transform: scale(1);
     }
 
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f1f3f4;
+    }
+    .settings-header h2 { margin: 0; font-size: 18px; font-weight: 600; color: #202124; }
+    .close-modal-btn {
+      background: none; border: none; font-size: 22px; color: #5f6368; cursor: pointer;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .setting-item label { font-size: 14px; font-weight: 500; color: #3c4043; }
+    .setting-item select, .setting-item input[type="range"] {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #dadce0;
+      font-size: 13px;
+    }
+
+    .locate-btn {
+      position: absolute;
+      bottom: 80px;
+      right: 12px;
+      width: 38px;
+      height: 38px;
+      background: #ffffff;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      z-index: 10;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: transform 0.15s ease, color 0.15s ease;
+    }
+    .locate-btn:hover { 
+      transform: scale(1.08); 
+    }
+    .locate-btn.active { 
+      color: #1a73e8; 
+    }
+
+    .user-location-marker {
+      width: 14px;
+      height: 14px;
+      background: #1a73e8;
+      border: 2.5px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(26, 115, 232, 0.8);
+      animation: pulse-ring 2s infinite;
+    }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.6); }
+      70% { box-shadow: 0 0 0 10px rgba(26, 115, 232, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0); }
+    }
+
+    .poi-div-icon { 
+      pointer-events: auto; 
+    }
     .poi-label {
       display: inline-flex;
       align-items: center;
@@ -73,17 +232,14 @@
       color: #111;
       white-space: nowrap;
     }
-
-    .poi-icon {
-      font-size: 12px;
-      line-height: 1;
+    .poi-icon { 
+      font-size: 12px; 
+      line-height: 1; 
     }
-
-    .poi-title {
-      font-weight: 600;
-      color: #111;
+    .poi-title { 
+      font-weight: 600; 
+      color: #111; 
     }
-
     .poi-tooltip {
       background: rgba(0, 0, 0, 0.8);
       color: #fff;
@@ -110,197 +266,188 @@
       opacity: 0;
       transition: transform 0.25s ease, opacity 0.25s ease;
     }
-
-    .building-panel.open {
-      transform: translateX(0);
-      opacity: 1;
+    .building-panel.open { 
+      transform: translateX(0); 
+      opacity: 1; 
+    }
+    .gm-panel-header { 
+      position: relative; 
+      padding: 20px 20px 16px 20px; 
+      border-bottom: 1px solid #ececec; 
+    }
+    .gm-header-label { 
+      font-size: 12px; 
+      font-weight: 600; 
+      text-transform: uppercase; 
+      letter-spacing: 0.04em; 
+      color: #1a73e8; 
+      margin-bottom: 6px; 
+    }
+    .gm-panel-header h2 { 
+      margin: 0 0 6px 0; 
+      font-size: 20px; 
+      font-weight: 500; 
+      color: #202124; 
+      padding-right: 30px; 
+    }
+    .gm-panel-header p { 
+      margin: 0; 
+      font-size: 13px; 
+      color: #5f6368; 
+      line-height: 1.45; 
+    }
+    .gm-close-btn { 
+      position: absolute; 
+      top: 14px; right: 14px; 
+      width: 32px; height: 32px; 
+      border-radius: 50%; 
+      border: none; 
+      background: #f1f3f4; 
+      font-size: 18px; 
+      color: #5f6368; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+    }
+    .gm-close-btn:hover { 
+      background: #e8eaed; 
+    }
+    .gm-panel-content { 
+      display: flex; 
+      flex-direction: row; 
+      flex: 1; 
+      overflow: hidden; 
+    }
+    .gm-floor-tabs { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+      padding: 16px 12px; 
+      background: #f8f9fa; 
+      border-right: 1px solid #ececec; 
+      align-items: center; 
+      overflow-y: auto; 
+    }
+    .gm-floor-tabs:has(.building-floor-tab:only-child), .gm-floor-tabs:empty { 
+      display: none; 
+    }
+    .building-floor-tab { 
+      width: 36px; 
+      height: 36px; 
+      border-radius: 50%; 
+      border: 1.5px solid #dadce0; 
+      background: white; 
+      font-size: 12px; 
+      font-weight: 700; 
+      color: #3c4043; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08); 
+      flex-shrink: 0; 
+    }
+    .building-floor-tab:hover { 
+      background: #f1f3f4; 
+      transform: scale(1.12); 
+      border-color: #1a73e8; 
+      color: #1a73e8; 
+    }
+    .building-floor-tab.active { 
+      background: #1a73e8; 
+      border-color: #1a73e8; 
+      color: white; 
+      box-shadow: 0 0 12px rgba(26, 115, 232, 0.45); 
+      transform: scale(1.05); 
+    }
+    .gm-panel-body { 
+      flex: 1; 
+      padding: 16px 20px 20px 20px; 
+      overflow-y: auto; 
+    }
+    .gm-section { 
+      margin-bottom: 18px; 
+    }
+    .gm-section:last-child { 
+      margin-bottom: 0; 
+    }
+    .gm-section-label { 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+      font-size: 12px; 
+      font-weight: 600; 
+      text-transform: uppercase; 
+      letter-spacing: 0.04em; 
+      color: #5f6368; 
+      margin-bottom: 8px; 
+    }
+    .gm-list { 
+      list-style: none; 
+      margin: 0; 
+      padding: 0; 
+    }
+    .gm-list li { 
+      padding: 9px 10px; 
+      font-size: 14px; 
+      color: #202124; 
+      border-bottom: 1px solid #f1f3f4; 
+    }
+    .gm-list li:last-child { 
+      border-bottom: none; 
     }
 
-    .gm-panel-header {
-      position: relative;
-      padding: 20px 20px 16px 20px;
-      border-bottom: 1px solid #ececec;
+    path.leaflet-interactive:focus, .leaflet-interactive:focus, .leaflet-container path { 
+      outline: none !important; 
+      -webkit-tap-highlight-color: transparent; 
     }
-
-    .gm-header-label {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #1a73e8;
-      margin-bottom: 6px;
-    }
-
-    .gm-panel-header h2 {
-      margin: 0 0 6px 0;
-      font-size: 20px;
-      font-weight: 500;
-      color: #202124;
-      padding-right: 30px;
-    }
-
-    .gm-panel-header p {
-      margin: 0;
-      font-size: 13px;
-      color: #5f6368;
-      line-height: 1.45;
-    }
-
-    .gm-close-btn {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      background: #f1f3f4;
-      font-size: 18px;
-      color: #5f6368;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .gm-close-btn:hover { background: #e8eaed; }
-
-    .gm-panel-content {
-      display: flex;
-      flex-direction: row;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .gm-floor-tabs {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 16px 12px;
-      background: #f8f9fa;
-      border-right: 1px solid #ececec;
-      align-items: center;
-      overflow-y: auto;
-    }
-
-    .gm-floor-tabs:has(.building-floor-tab:only-child),
-    .gm-floor-tabs:empty {
-      display: none;
-    }
-
-    .building-floor-tab {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1.5px solid #dadce0;
-      background: white;
-      font-size: 12px;
-      font-weight: 700;
-      color: #3c4043;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      flex-shrink: 0;
-    }
-    .building-floor-tab:hover {
-      background: #f1f3f4;
-      transform: scale(1.12);
-      border-color: #1a73e8;
-      color: #1a73e8;
-    }
-    .building-floor-tab.active {
-      background: #1a73e8;
-      border-color: #1a73e8;
-      color: white;
-      box-shadow: 0 0 12px rgba(26, 115, 232, 0.45);
-      transform: scale(1.05);
-    }
-
-    .gm-panel-body {
-      flex: 1;
-      padding: 16px 20px 20px 20px;
-      overflow-y: auto;
-    }
-
-    .gm-section { margin-bottom: 18px; }
-    .gm-section:last-child { margin-bottom: 0; }
-
-    .gm-section-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #5f6368;
-      margin-bottom: 8px;
-    }
-
-    .gm-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .gm-list li {
-      padding: 9px 10px;
-      font-size: 14px;
-      color: #202124;
-      border-bottom: 1px solid #f1f3f4;
-    }
-    .gm-list li:last-child { border-bottom: none; }
-
-    path.leaflet-interactive:focus,
-    .leaflet-interactive:focus,
-    .leaflet-container path {
-      outline: none !important;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .leaflet-interactive {
-      transition: fill-opacity 0.25s ease, stroke 0.25s ease, stroke-width 0.25s ease;
-      cursor: pointer;
+    .leaflet-interactive { 
+      transition: fill-opacity 0.25s ease, stroke 0.25s ease, stroke-width 0.25s ease; 
+      cursor: pointer; 
     }
 
     @media (max-width: 600px) {
-      .building-panel {
-        top: auto;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        max-height: 55vh;
-        border-radius: 16px 16px 0 0;
-        transform: translateY(100%);
+      .floating-title { 
+        max-width: 180px; 
       }
-      .building-panel.open {
-        transform: translateY(0);
+      .category-chips-bar { 
+        left: 210px; 
+        max-width: calc(100vw - 270px); 
       }
-
-      .gm-panel-content {
-        flex-direction: column;
+      .building-panel { 
+        top: auto; 
+        bottom: 0; 
+        left: 0; 
+        width: 100%; 
+        max-height: 55vh; 
+        border-radius: 16px 16px 0 0; 
+        transform: translateY(100%); 
       }
-
-      .gm-floor-tabs {
-        flex-direction: row;
-        width: 100%;
-        box-sizing: border-box;
-        padding: 10px 16px;
-        border-right: none;
-        border-bottom: 1px solid #ececec;
-        overflow-x: auto;
-        justify-content: flex-start;
+      .building-panel.open { 
+        transform: translateY(0); 
       }
-
-      .building-floor-tab {
-        width: auto;
-        min-width: 44px;
-        height: 32px;
-        border-radius: 16px;
-        padding: 0 12px;
-        font-size: 13px;
+      .gm-panel-content { 
+        flex-direction: column; 
+      }
+      .gm-floor-tabs { 
+        flex-direction: row; 
+        width: 100%; 
+        box-sizing: border-box; 
+        padding: 10px 16px; 
+        border-right: none; 
+        border-bottom: 1px solid #ececec; 
+        overflow-x: auto; 
+        justify-content: flex-start; 
+      }
+      .building-floor-tab { 
+        width: auto; 
+        min-width: 44px; 
+        height: 32px; 
+        border-radius: 16px; 
+        padding: 0 12px; 
+        font-size: 13px; 
       }
     }
   </style>
@@ -308,6 +455,46 @@
 <body>
 
 <div id="map"></div>
+
+<div class="floating-title">
+  <h1>SFC Heatmap</h1>
+  <a href="homepage.html">Back to homepage</a>
+</div>
+
+<div class="category-chips-bar">
+  <button class="chip-btn active" data-category="all">All</button>
+  <button class="chip-btn" data-category="water_fountain">🚰 Water</button>
+  <button class="chip-btn" data-category="printer">🖨️ Printer</button>
+  <button class="chip-btn" data-category="washroom">🚻 Restroom</button>
+  <button class="chip-btn" data-category="garbage">🗑️ Garbage</button>
+</div>
+
+<button id="meta-settings-btn" class="floating-gear-btn" title="Settings">&#9881;</button>
+
+<div id="settings-modal" class="settings-modal">
+  <div class="settings-modal-content">
+    <div class="settings-header">
+      <h2>System Settings</h2>
+      <button id="close-settings-btn" class="close-modal-btn">&times;</button>
+    </div>
+    <div class="settings-body">
+      <div class="setting-item">
+        <label for="setting-lang">Language / 言語</label>
+        <select id="setting-lang">
+          <option value="en" selected>English</option>
+          <option value="ja">日本語</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label for="setting-heatmap">Show Heatmap</label>
+        <input type="checkbox" id="setting-heatmap" checked />
+      </div>
+    </div>
+  </div>
+</div>
+
+<button id="locate-btn" class="locate-btn" title="Re-center on my location">🎯</button>
 
 <div id="building-panel" class="building-panel">
   <div class="gm-panel-header">
@@ -334,13 +521,8 @@
   </div>
 </div>
 
-<div class="floating-title">
-  <h1>SFC Network Heatmap Service</h1>
-  <a href="homepage.html">Back to homepage</a>
-</div>
-
 <script src="config.js" defer></script>
-<script src="map_page.js" defer></script>
+<script type="module" src="map_page.js" defer></script>
 
 </body>
 </html>

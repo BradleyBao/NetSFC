@@ -13,7 +13,7 @@ const BOUNDS = {
     maxLng: 139.433,
 }
 
-function boundCheck(lat, lng) {
+export function boundCheck(lat, lng) {
     return (
         lat >= BOUNDS.minLat &&
         lat <= BOUNDS.maxLat &&

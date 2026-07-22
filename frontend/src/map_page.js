@@ -1,18 +1,19 @@
 // Generates a heatmap with zoom/pan support
 // Should be able to show user location and display POI items directly on the map
+import { boundCheck } from './measure_page.js';
 
 const MAP_CONFIG = {
     center: [35.3883, 139.4283], // default center, SFC campus
     zoom: 17,
     minZoom: 10,
     maxZoom: 22,
-}
+};
 
 const POI_ICONS = {
     washroom: '🚻',
     garbage: '🗑️',
     printer: '🖨️',
-    water_fountain: '💧',
+    water_fountain: '🚰',
     elevator: '🛗',
     accessible_washroom: '♿',
     building: '🏢'
@@ -21,8 +22,15 @@ const POI_ICONS = {
 let map;
 let heatLayer;
 let heatPoints = [];
-let currentMarker = null;
-let accuracyCircle = null;
+
+let userLocationMarker = null;
+let userAccuracyCircle = null;
+let currentUserLatLng = null;
+let isFirstLocation = true;
+
+let allPointFacilities = []; // Holds point items until building is called
+let itemLayerGroup = null; // Tracks shown items on map
+let categoryFilterLayerGroup = null; // Layer for global category filters (e.g., water fountains)
 
 window.onload = function() {
     map = L.map('map', {
@@ -65,14 +73,14 @@ window.onload = function() {
     }).addTo(map);
 
     loadPOIs();
+    initGeolocation();
+    initSettingsModal();
+    initCategoryChips();
 };
-
-let allPointFacilities = []; // Holds point items until building is called
-let itemLayerGroup = null;  // Tracks shown items on map
 
 function loadPOIs() {
     const url = `${window.ENV.API_HOST}/api/pois`;
-    fetch(url)  // Used local file for testing purposes, should work when server is updated ("/data/facilities.json")
+    fetch(url)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);
@@ -81,7 +89,7 @@ function loadPOIs() {
         })
         .then(facilities => {
             const { buildingItems, pointItems } = transformFacilities(facilities);
-            allPointFacilities = pointItems; // Store first, don't place items from start
+            allPointFacilities = pointItems;
             placePOIs(buildingItems);
         })
         .catch(error => {
@@ -132,9 +140,9 @@ function placePOIs(items) {
             const labelText = item.name || item.layer_type.replace(/_/g, ' ');
 
             const polygon = L.polygon(item.coords, {
-                color: '#3388ff',
-                weight: 2,
-                fillOpacity: 0.25,
+                color: '#1a73e8',
+                weight: 1.5,
+                fillOpacity: 0.20,
                 interactive: true
             }).addTo(map);
 
@@ -147,10 +155,10 @@ function placePOIs(items) {
             };
 
             polygon.on('click', handleBuildingClick);
-            polygon.on('mouseover', () => polygon.setStyle({ fillOpacity: 0.45 }));
-            polygon.on('mouseout', () => polygon.setStyle({ fillOpacity: 0.25 }));
+            polygon.on('mouseover', () => polygon.setStyle({ fillOpacity: 0.40 }));
+            polygon.on('mouseout', () => polygon.setStyle({ fillOpacity: 0.20 }));
 
-            const icon = POI_ICONS['building'] || '📍';
+            const icon = POI_ICONS['building'] || '🏢';
             const html = `
                 <div class="poi-label">
                     <span class="poi-icon">${icon}</span>
@@ -161,7 +169,7 @@ function placePOIs(items) {
                 html,
                 className: 'poi-div-icon',
                 iconSize: [100, 24],
-                iconAnchor: [60, 12],
+                iconAnchor: [50, 12],
                 popupAnchor: [0, -12],
             });
 
@@ -185,6 +193,153 @@ function getPolygonCentroid(coords) {
     }, { lat: 0, lng: 0 });
 
     return [total.lat / coords.length, total.lng / coords.length];
+}
+
+// Get user locaton
+function initGeolocation() {
+    const locateBtn = document.getElementById('locate-btn');
+
+    if (!navigator.geolocation) {
+        console.warn('Geolocation is not supported by your browser');
+        return;
+    }
+    navigator.geolocation.watchPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+
+            currentUserLatLng = [lat, lng];
+            if (locateBtn) locateBtn.classList.add('active');
+
+            // User Location Marker & Accuracy Circle
+            if (userLocationMarker) {
+                userLocationMarker.setLatLng(currentUserLatLng);
+            } else {
+                const userIcon = L.divIcon({
+                    className: 'user-location-marker',
+                    iconSize: [14, 14],
+                    iconAnchor: [7, 7]
+                });
+                userLocationMarker = L.marker(currentUserLatLng, { icon: userIcon }).addTo(map);
+            }
+
+            if (userAccuracyCircle) {
+                userAccuracyCircle.setLatLng(currentUserLatLng);
+                userAccuracyCircle.setRadius(accuracy);
+            } else {
+                userAccuracyCircle = L.circle(currentUserLatLng, {
+                    radius: accuracy,
+                    color: '#1a73e8',
+                    fillColor: '#1a73e8',
+                    fillOpacity: 0.12,
+                    weight: 1.5,
+                    interactive: false
+                }).addTo(map);
+            }
+
+            // Locate user on first location update if user is in the campus bounds
+            if (isFirstLocation && boundCheck(currentUserLatLng[0], currentUserLatLng[1])) {
+                map.flyTo(currentUserLatLng, 18, { animate: true });
+                isFirstLocation = false;
+            }
+        },
+        (error) => {
+            console.warn('Geolocation Error:', error.code, error.message);
+            if (locateBtn) locateBtn.classList.remove('active');
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 2000
+        }
+    );
+
+    if (locateBtn) {
+        locateBtn.addEventListener('click', () => {
+            if (currentUserLatLng) {
+                map.flyTo(currentUserLatLng, 18, { animate: true });
+            } else {
+                alert('Please check if location permissions are allowed.');
+            }
+        });
+    }
+}
+
+// Category Filter Chips
+function initCategoryChips() {
+    const chipBtns = document.querySelectorAll('.chip-btn');
+
+    chipBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            chipBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const category = btn.getAttribute('data-category');
+            filterPOIsByCategory(category);
+        });
+    });
+}
+
+function filterPOIsByCategory(category) {
+    if (categoryFilterLayerGroup) {
+        map.removeLayer(categoryFilterLayerGroup);
+        categoryFilterLayerGroup = null;
+    }
+    if (!category || category === 'all') return;
+
+    categoryFilterLayerGroup = L.layerGroup().addTo(map);
+    const matchingFacilities = allPointFacilities.filter(f => f.layer_type === category);
+
+    matchingFacilities.forEach(item => {
+        if (!item.coords || item.coords.length < 2) return;
+
+        const icon = POI_ICONS[item.layer_type] || '📍';
+        const labelText = item.name || item.layer_type.replace(/_/g, ' ');
+        const html = `
+            <div class="poi-label">
+                <span class="poi-icon">${icon}</span>
+                <span class="poi-title">${labelText}</span>
+            </div>
+        `;
+        const poiIcon = L.divIcon({
+            html,
+            className: 'poi-div-icon',
+            iconSize: [120, 24],
+            iconAnchor: [12, 12],
+            popupAnchor: [0, -12],
+        });
+
+        L.marker([item.coords[0], item.coords[1]], { icon: poiIcon, interactive: true })
+            .addTo(categoryFilterLayerGroup)
+            .bindTooltip(labelText, {
+                direction: 'top',
+                offset: [0, -12],
+                permanent: false,
+                opacity: 0.85,
+                className: 'poi-tooltip'
+            });
+    });
+}
+
+function initSettingsModal() {
+    const gearBtn = document.getElementById('meta-settings-btn');
+    const modal = document.getElementById('settings-modal');
+    const closeBtn = document.getElementById('close-settings-btn');
+
+    if (gearBtn && modal) {
+        gearBtn.addEventListener('click', () => modal.classList.add('open'));
+    }
+
+    const closeModal = () => modal && modal.classList.remove('open');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    }
 }
 
 function showItemsForBuilding(buildingName) {
@@ -353,40 +508,4 @@ function transformFacilities(facilities) {
     const pointItems = pointFacilities.filter(f => f.coords); 
 
     return { buildingItems, pointItems };
-}
-
-function placeMarker(lat, long, acc) {
-    if (currentMarker) map.removeLayer(currentMarker);
-    if (accuracyCircle) map.removeLayer(accuracyCircle);
-
-    currentMarker = L.marker([lat, long])
-        .addTo(map)
-        .bindPopup(
-            `<b>Your location</b><br>
-            Lat: ${lat.toFixed(6)}°<br>
-            Long: ${long.toFixed(6)}°<br>
-            Accuracy: ±${Math.round(acc)} m`
-        )
-        .openPopup();
-
-    accuracyCircle = L.circle([lat, long], {
-        radius: acc,
-        color: '#4f8ef7',
-        fillColor: '#4f8ef7',
-        fillOpacity: 0.15,
-        weight: 1
-    }).addTo(map);
-
-    map.flyToBounds(accuracyCircle.getBounds(), {
-        padding: [48, 48],
-        duration: 1.4,
-        easeLinearity: 0.25,
-    });
-
-    addHeatmapPoint(lat, long, 1.0);
-}
-
-function addHeatmapPoint(lat, long, intensity = 1.0) {
-    heatPoints.push([lat, long, intensity]);
-    heatLayer.setLatLngs(heatPoints);
 }
