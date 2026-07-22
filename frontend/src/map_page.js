@@ -66,6 +66,9 @@ window.onload = function() {
     loadPOIs();
 };
 
+let allPointFacilities = []; // Holds point items until building is called
+let itemLayerGroup = null;  // Tracks shown items on map
+
 function loadPOIs() {
     const url = `${window.ENV.API_HOST}/api/pois`;
     fetch(url)  // Used local file for testing purposes, should work when server is updated ("/data/facilities.json")
@@ -77,8 +80,8 @@ function loadPOIs() {
         })
         .then(facilities => {
             const { buildingItems, pointItems } = transformFacilities(facilities);
+            allPointFacilities = pointItems; // Store first, don't place items from start
             placePOIs(buildingItems);
-            placePOIs(pointItems);
         })
         .catch(error => {
             console.error('Failed to load POIs', error);
@@ -183,6 +186,47 @@ function getPolygonCentroid(coords) {
     return [total.lat / coords.length, total.lng / coords.length];
 }
 
+function showItemsForBuilding(buildingName) {
+    // clear whatever items were shown for the previously clicked building
+    if (itemLayerGroup) {
+        map.removeLayer(itemLayerGroup);
+        itemLayerGroup = null;
+    }
+
+    const matchingItems = allPointFacilities.filter(f => f.building === buildingName);
+    if (matchingItems.length === 0) return;
+
+    itemLayerGroup = L.layerGroup().addTo(map);
+
+    matchingItems.forEach(item => {
+        const icon = POI_ICONS[item.layer_type] || '📍';
+        const labelText = item.name || item.layer_type.replace(/_/g, ' ');
+        const html = `
+            <div class="poi-label">
+                <span class="poi-icon">${icon}</span>
+                <span class="poi-title">${labelText}</span>
+            </div>
+        `;
+        const poiIcon = L.divIcon({
+            html,
+            className: 'poi-div-icon',
+            iconSize: [120, 24],
+            iconAnchor: [8, 12],
+            popupAnchor: [0, -12],
+        });
+
+        L.marker([item.coords[0], item.coords[1]], { icon: poiIcon, interactive: true })
+            .addTo(itemLayerGroup)   // add to the group, not directly to map
+            .bindTooltip(labelText, {
+                direction: 'top',
+                offset: [0, -12],
+                permanent: false,
+                opacity: 0.85,
+                className: 'poi-tooltip'
+            });
+    });
+}
+
 let currentBuildingFloors = [];
 
 function openBuildingPanel(item) {
@@ -190,6 +234,8 @@ function openBuildingPanel(item) {
     document.getElementById('building-panel-description').textContent = item.description || '';
 
     currentBuildingFloors = item.floors || [];
+
+    showItemsForBuilding(item.building || item.name); // Filter items by its building
 
     const tabsContainer = document.getElementById('building-floor-tabs');
     tabsContainer.innerHTML = '';
@@ -228,28 +274,38 @@ function renderFloorContent(floor) {
         .map(i => `<li>${i}</li>`).join('') || '<li style="color:#999;">None listed</li>';
 }
 
-document.getElementById('building-panel-close').addEventListener('click', () => {
+function closeBuildingPanel() {
     document.getElementById('building-panel').classList.remove('open');
+
+    if (itemLayerGroup) {
+        map.removeLayer(itemLayerGroup);
+        itemLayerGroup = null;
+    }
+}
+
+document.getElementById('building-panel-close').addEventListener('click', () => {
+    closeBuildingPanel();
 });
 
 function transformFacilities(facilities) {
     const buildingPolygons = facilities.filter(f => f.layer_type === 'polygon');
     const pointFacilities = facilities.filter(f => f.layer_type !== 'polygon');
 
-    // Group point facilities by building -> floor -> [item names]
+    // Group point facilities by building -> floor -> items
     const groupedByBuilding = {};
     pointFacilities.forEach(f => {
-        if (!f.building) return;
-        if (!groupedByBuilding[f.building]) groupedByBuilding[f.building] = {};
+        const buildingKey = f.building;
+        if (!buildingKey) return;
+        if (!groupedByBuilding[buildingKey]) groupedByBuilding[buildingKey] = {};
         const floorKey = f.floor || 'Unspecified';
-        if (!groupedByBuilding[f.building][floorKey]) groupedByBuilding[f.building][floorKey] = [];
-        groupedByBuilding[f.building][floorKey].push(f.name);
+        if (!groupedByBuilding[buildingKey][floorKey]) groupedByBuilding[buildingKey][floorKey] = [];
+        groupedByBuilding[buildingKey][floorKey].push(f.name);
     });
 
     // Building polygons -> match placePOIs' expected shape
     const buildingItems = buildingPolygons.map(poly => {
         const coords = poly.coords;
-
+        const buildingName = poly.building;
         const floorMap = groupedByBuilding[poly.building] || {};
 
         let declaredFloors = [];
@@ -285,7 +341,8 @@ function transformFacilities(facilities) {
 
         return {
             layer_type: 'building', 
-            name: poly.name,
+            name: buildingName,
+            building: buildingName,
             description: poly.description || '',
             coords: coords,
             floors: floors
