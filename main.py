@@ -11,6 +11,9 @@ load_dotenv()
 APITITLE:str | None = os.getenv("APITITLE")
 VERSION:str | None = os.getenv("VERSION")
 DB_NAME:str | None = os.getenv("DB_NAME")
+RUNTIME:str | None = os.getenv("RUNTIME")
+raw_origins = os.getenv("CORS_ORIGINS", "")
+origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
 
 if not APITITLE or not VERSION or not DB_NAME:
     logger.error("Configuration Error")
@@ -19,13 +22,17 @@ if not APITITLE or not VERSION or not DB_NAME:
 app = FastAPI(title=APITITLE, version=VERSION)
 init_db(DB_NAME)
 
-# TODO Enable CORS for development, should be removed in production
+if not origins or RUNTIME == "DEBUG":
+    origins = ["*"]
+
+ORIGINS = origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins = ORIGINS,
+    allow_credentials = True,
+    allow_methods = ["*"],
+    allow_headers = ["*"],
 )
 
 class MeasurementReport(BaseModel):
