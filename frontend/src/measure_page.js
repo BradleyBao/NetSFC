@@ -66,7 +66,6 @@ function success(position) {
 
         if (networkButton) {
             networkButton.style.display = 'inline-block';
-            networkButton.onclick = checkNetwork;
         }
     }
 
@@ -100,3 +99,5 @@ function errorResult(error) {
     document.getElementById('status').textContent    = messages[error.code] || 'Unknown error.';
     document.getElementById('button_locate').disabled = false;
 }
+
+window.getLocation = getLocation;
