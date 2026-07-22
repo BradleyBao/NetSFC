@@ -5,7 +5,7 @@ const MAP_CONFIG = {
     center: [35.3883, 139.4283], // default center, SFC campus
     zoom: 17,
     minZoom: 10,
-    maxZoom: 19,
+    maxZoom: 22,
 }
 
 const POI_ICONS = {
@@ -51,6 +51,7 @@ window.onload = function() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: MAP_CONFIG.maxZoom,
+        maxNativeZoom: 19,
         keepBuffer: 4,
         updateWhenIdle: false,
         updateWhenZooming: false,

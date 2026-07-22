@@ -98,7 +98,7 @@
       top: 90px;
       left: 16px;
       width: 340px;
-      max-height: calc(100vh - 32px);
+      max-height: calc(100vh - 120px);
       background: white;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.18);
@@ -164,34 +164,62 @@
     }
     .gm-close-btn:hover { background: #e8eaed; }
 
+    .gm-panel-content {
+      display: flex;
+      flex-direction: row;
+      flex: 1;
+      overflow: hidden;
+    }
+
     .gm-floor-tabs {
       display: flex;
+      flex-direction: column;
       gap: 8px;
-      padding: 14px 20px;
-      border-bottom: 1px solid #ececec;
-      overflow-x: auto;
+      padding: 16px 12px;
+      background: #f8f9fa;
+      border-right: 1px solid #ececec;
+      align-items: center;
+      overflow-y: auto;
+    }
+
+    .gm-floor-tabs:has(.building-floor-tab:only-child),
+    .gm-floor-tabs:empty {
+      display: none;
     }
 
     .building-floor-tab {
-      flex-shrink: 0;
-      padding: 6px 14px;
-      border: 1px solid #dadce0;
-      border-radius: 20px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid #dadce0;
       background: white;
-      font-size: 13px;
-      font-weight: 500;
+      font-size: 12px;
+      font-weight: 700;
       color: #3c4043;
       cursor: pointer;
-      transition: background 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      flex-shrink: 0;
     }
-    .building-floor-tab:hover { background: #f1f3f4; }
+    .building-floor-tab:hover {
+      background: #f1f3f4;
+      transform: scale(1.12);
+      border-color: #1a73e8;
+      color: #1a73e8;
+    }
     .building-floor-tab.active {
       background: #1a73e8;
       border-color: #1a73e8;
       color: white;
+      box-shadow: 0 0 12px rgba(26, 115, 232, 0.45);
+      transform: scale(1.05);
     }
 
     .gm-panel-body {
+      flex: 1;
       padding: 16px 20px 20px 20px;
       overflow-y: auto;
     }
@@ -224,6 +252,57 @@
       border-bottom: 1px solid #f1f3f4;
     }
     .gm-list li:last-child { border-bottom: none; }
+
+    path.leaflet-interactive:focus,
+    .leaflet-interactive:focus,
+    .leaflet-container path {
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .leaflet-interactive {
+      transition: fill-opacity 0.25s ease, stroke 0.25s ease, stroke-width 0.25s ease;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .building-panel {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: 55vh;
+        border-radius: 16px 16px 0 0;
+        transform: translateY(100%);
+      }
+      .building-panel.open {
+        transform: translateY(0);
+      }
+
+      .gm-panel-content {
+        flex-direction: column;
+      }
+
+      .gm-floor-tabs {
+        flex-direction: row;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px 16px;
+        border-right: none;
+        border-bottom: 1px solid #ececec;
+        overflow-x: auto;
+        justify-content: flex-start;
+      }
+
+      .building-floor-tab {
+        width: auto;
+        min-width: 44px;
+        height: 32px;
+        border-radius: 16px;
+        padding: 0 12px;
+        font-size: 13px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -238,17 +317,19 @@
     <p id="building-panel-description"></p>
   </div>
 
-  <div id="building-floor-tabs" class="gm-floor-tabs"></div>
+  <div class="gm-panel-content">
+    <div id="building-floor-tabs" class="gm-floor-tabs"></div>
 
-  <div class="gm-panel-body">
-    <div class="gm-section">
-      <div class="gm-section-label">Classrooms</div>
-      <ul id="building-panel-classrooms" class="gm-list"></ul>
-    </div>
+    <div class="gm-panel-body">
+      <div class="gm-section">
+        <div class="gm-section-label">Classrooms</div>
+        <ul id="building-panel-classrooms" class="gm-list"></ul>
+      </div>
 
-    <div class="gm-section">
-      <div class="gm-section-label">Items</div>
-      <ul id="building-panel-items" class="gm-list"></ul>
+      <div class="gm-section">
+        <div class="gm-section-label">Items</div>
+        <ul id="building-panel-items" class="gm-list"></ul>
+      </div>
     </div>
   </div>
 </div>

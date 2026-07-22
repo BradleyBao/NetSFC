@@ -101,6 +101,9 @@ def init_db(db_name: str) -> None:
     ensure_column(cursor, 'campus_pois', 'floor', 'TEXT')
     ensure_column(cursor, 'campus_pois', 'coords', 'TEXT DEFAULT "[]"')
 
+    RUNTIME: str | None = os.getenv("RUNTIME")
+    if RUNTIME and RUNTIME.upper() == "DEBUG":
+        cursor.execute("DELETE FROM campus_pois")
     facilities = load_facilities_json()
 
     for facility in facilities:
