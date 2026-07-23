@@ -178,10 +178,10 @@
 
     .locate-btn {
       position: absolute;
-      bottom: 80px;
-      right: 12px;
-      width: 38px;
-      height: 38px;
+      bottom: 100px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
       background: #ffffff;
       border: none;
       border-radius: 50%;
@@ -253,7 +253,7 @@
       position: absolute;
       top: 90px;
       left: 16px;
-      width: 340px;
+      width: 460px;
       max-height: calc(100vh - 120px);
       background: white;
       border-radius: 12px;
@@ -332,6 +332,7 @@
     .gm-floor-tabs:has(.building-floor-tab:only-child), .gm-floor-tabs:empty { 
       display: none; 
     }
+
     .building-floor-tab { 
       width: 36px; 
       height: 36px; 
@@ -366,6 +367,25 @@
       flex: 1; 
       padding: 16px 20px 20px 20px; 
       overflow-y: auto; 
+    }
+    .gm-floor-image-wrap {
+      width: 100%;
+      height: 220px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e8eaed;
+      overflow: hidden;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gm-floor-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
     }
     .gm-section { 
       margin-bottom: 18px; 
@@ -508,6 +528,10 @@
     <div id="building-floor-tabs" class="gm-floor-tabs"></div>
 
     <div class="gm-panel-body">
+      <div class="gm-floor-image-wrap">
+        <img id="building-floor-image" class="gm-floor-image" src="" alt="Floor layout" />
+      </div>
+
       <div class="gm-section">
         <div class="gm-section-label">Classrooms</div>
         <ul id="building-panel-classrooms" class="gm-list"></ul>

@@ -151,32 +151,17 @@ function placePOIs(items) {
             const handleBuildingClick = (event) => {
                 if (event.originalEvent) L.DomEvent.stopPropagation(event);
                 openBuildingPanel(item);
-                map.flyToBounds(polygon.getBounds(), { padding: [60, 60], duration: 0.5, maxZoom: 19 });
+                map.flyToBounds(polygon.getBounds(), {
+                    paddingTopLeft: [380, 80],
+                    paddingBottomRight: [60, 60],
+                    duration: 0.5,
+                    maxZoom: 20
+                });
             };
 
             polygon.on('click', handleBuildingClick);
             polygon.on('mouseover', () => polygon.setStyle({ fillOpacity: 0.40 }));
             polygon.on('mouseout', () => polygon.setStyle({ fillOpacity: 0.20 }));
-
-            const icon = POI_ICONS['building'] || '🏢';
-            const html = `
-                <div class="poi-label">
-                    <span class="poi-icon">${icon}</span>
-                    <span class="poi-title">${labelText}</span>
-                </div>
-            `;
-            const buildingIcon = L.divIcon({
-                html,
-                className: 'poi-div-icon',
-                iconSize: [100, 24],
-                iconAnchor: [50, 12],
-                popupAnchor: [0, -12],
-            });
-
-            const centroid = getPolygonCentroid(item.coords);
-            L.marker(centroid, { icon: buildingIcon, interactive: true })
-                .addTo(map)
-                .on('click', handleBuildingClick);
 
             return;
         }
@@ -422,12 +407,16 @@ function selectFloor(index) {
 function renderFloorContent(floor) {
     const classroomsEl = document.getElementById('building-panel-classrooms');
     const itemsEl = document.getElementById('building-panel-items');
+    const imageEl = document.getElementById('building-floor-image');
 
     classroomsEl.innerHTML = (floor.classrooms || [])
         .map(c => `<li>${c}</li>`).join('') || '<li style="color:#999;">None listed</li>';
 
     itemsEl.innerHTML = (floor.items || [])
         .map(i => `<li>${i}</li>`).join('') || '<li style="color:#999;">None listed</li>';
+
+    imageEl.src = floor.image_url || `https://placehold.co/600x375?text=${encodeURIComponent(floor.label || 'Floor Plan')}`;
+
 }
 
 function closeBuildingPanel() {

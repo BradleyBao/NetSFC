@@ -157,3 +157,10 @@ async function checkNetwork() {
     }
     button.disabled = false;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const networkBtn = document.getElementById('button_network');
+    if (networkBtn) {
+        networkBtn.addEventListener('click', checkNetwork);
+    }
+});
