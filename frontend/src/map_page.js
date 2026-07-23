@@ -19,6 +19,8 @@ const POI_ICONS = {
     building: '🏢'
 };
 
+const LABEL_ZOOM_THRESHOLD = 19;
+
 let map;
 let heatLayer;
 let heatPoints = [];
@@ -72,6 +74,9 @@ window.onload = function() {
         gradient: { 0.4: 'blue', 0.7: 'orange', 1.0: 'red' }
     }).addTo(map);
 
+    map.on('zoomend', updateLabelVisibility);
+
+    updateLabelVisibility();
     loadPOIs();
     initGeolocation();
     initSettingsModal();
@@ -107,7 +112,7 @@ function placePOIs(items) {
         // Handle Items
         if (item.coords.length === 2 && typeof item.coords[0] === 'number' && typeof item.coords[1] === 'number') {
             const icon = POI_ICONS[item.layer_type] || '📍';
-            const labelText = item.name || item.layer_type.replace(/_/g, ' ');
+            const labelText = item.layer_type.replace(/_/g, ' ');
             const html = `
                 <div class="poi-label">
                     <span class="poi-icon">${icon}</span>
@@ -286,7 +291,7 @@ function filterPOIsByCategory(category) {
         if (!item.coords || item.coords.length < 2) return;
 
         const icon = POI_ICONS[item.layer_type] || '📍';
-        const labelText = item.name || item.layer_type.replace(/_/g, ' ');
+        const labelText = item.layer_type.replace(/_/g, ' ');
         const html = `
             <div class="poi-label">
                 <span class="poi-icon">${icon}</span>
@@ -310,6 +315,8 @@ function filterPOIsByCategory(category) {
                 opacity: 0.85,
                 className: 'poi-tooltip'
             });
+            
+        updateLabelVisibility();
     });
 }
 
@@ -333,6 +340,24 @@ function initSettingsModal() {
     }
 }
 
+function updateLabelVisibility() {
+    let showLabels;
+    if (map.getZoom() >= LABEL_ZOOM_THRESHOLD) {
+        showLabels = true;
+    } else {
+        showLabels = false;
+    }
+
+    const labels = document.querySelectorAll('.poi-title');
+    labels.forEach(el => {
+        if (showLabels) {
+            el.style.display = 'inline';
+        } else {
+            el.style.display = 'none';
+        }
+    });
+}
+
 function showItemsForBuilding(buildingName) {
     // clear whatever items were shown for the previously clicked building
     if (itemLayerGroup) {
@@ -347,7 +372,7 @@ function showItemsForBuilding(buildingName) {
 
     matchingItems.forEach(item => {
         const icon = POI_ICONS[item.layer_type] || '📍';
-        const labelText = item.name || item.layer_type.replace(/_/g, ' ');
+        const labelText = item.layer_type.replace(/_/g, ' ');
         const html = `
             <div class="poi-label">
                 <span class="poi-icon">${icon}</span>
@@ -371,6 +396,8 @@ function showItemsForBuilding(buildingName) {
                 opacity: 0.85,
                 className: 'poi-tooltip'
             });
+
+        updateLabelVisibility();
     });
 }
 
