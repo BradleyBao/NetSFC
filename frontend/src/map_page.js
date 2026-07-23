@@ -267,11 +267,17 @@ function initCategoryChips() {
 
     chipBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            chipBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            const isAlreadyActive = btn.classList.contains('active'); // ADD THIS — must run BEFORE clearing classes
 
-            const category = btn.getAttribute('data-category');
-            filterPOIsByCategory(category);
+            chipBtns.forEach(b => b.classList.remove('active'));
+
+            if (isAlreadyActive) {
+                filterPOIsByCategory(null);
+            } else {
+                btn.classList.add('active');
+                const category = btn.getAttribute('data-category');
+                filterPOIsByCategory(category);
+            }
         });
     });
 }
