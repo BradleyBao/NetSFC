@@ -151,7 +151,12 @@ function placePOIs(items) {
             const handleBuildingClick = (event) => {
                 if (event.originalEvent) L.DomEvent.stopPropagation(event);
                 openBuildingPanel(item);
-                map.flyToBounds(polygon.getBounds(), { padding: [60, 60], duration: 0.5, maxZoom: 19 });
+                map.flyToBounds(polygon.getBounds(), {
+                    paddingTopLeft: [380, 80],
+                    paddingBottomRight: [60, 60],
+                    duration: 0.5,
+                    maxZoom: 20
+                });
             };
 
             polygon.on('click', handleBuildingClick);
