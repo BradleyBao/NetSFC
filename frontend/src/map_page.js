@@ -481,7 +481,8 @@ function transformFacilities(facilities) {
             level: floorLabel,
             label: floorLabel,
             classrooms: [],
-            items: floorMap[floorLabel] || []
+            items: floorMap[floorLabel] || [],
+            image_url: (poly.floor_images && poly.floor_images[floorLabel]) || null
         }));
 
         return {

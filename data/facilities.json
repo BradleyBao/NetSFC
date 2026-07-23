@@ -203,6 +203,10 @@
     "layer_type": "polygon",
     "building": "Kappa Building",
     "floor": "1F, 2F",
+    "floor_images": {
+      "1F": "/data/images/kappa_1_1f.png",
+      "2F": "/data/images/Kappa Building 1 Floor 2.png"
+    },
     "coords": [
       [
         35.3877722,
@@ -232,6 +236,9 @@
     "layer_type": "polygon",
     "building": "Kappa Building",
     "floor": "1F",
+    "floor_images": {
+      "1F": "/data/images/Kappa Building 2 Floor 1.png"
+    },
     "coords": [
       [
         35.3877928,
@@ -261,6 +268,10 @@
     "layer_type": "polygon",
     "building": "Epsilon Building",
     "floor": "1F, 2F",
+    "floor_images": {
+      "1F": "/data/images/epsilon_1_1f.png",
+      "2F": "/data/images/epsilon_1_2f.png"
+    },
     "coords": [
       [
         35.388075,
@@ -290,6 +301,9 @@
     "layer_type": "polygon",
     "building": "Epsilon Building",
     "floor": "1F",
+    "floor_images": {
+      "1F": "/data/images/epsilon_2_1f.png"
+    },
     "coords": [
       [
         35.3879278,
@@ -319,6 +333,10 @@
     "layer_type": "polygon",
     "building": "Iota Building",
     "floor": "1F, 2F",
+    "floor_images": {
+      "1F": "/data/images/iota_1_1f.png",
+      "2F": "/data/images/iota_1_2f.png"
+    },
     "coords": [
       [
         35.3882151,
@@ -348,6 +366,9 @@
     "layer_type": "polygon",
     "building": "Iota Building",
     "floor": "1F",
+    "floor_images": {
+      "1F": "/data/images/iota_2_1f.png"
+    },
     "coords": [
       [
         35.3884772,
@@ -377,6 +398,10 @@
     "layer_type": "polygon",
     "building": "Omicron Building",
     "floor": "1F, 2F",
+    "floor_images": {
+      "1F": "/data/images/omicron_1_1f.png",
+      "2F": "/data/images/omicron_1_2f.png"
+    },
     "coords": [
       [
         35.3887535,
@@ -406,6 +431,9 @@
     "layer_type": "polygon",
     "building": "Omicron Building",
     "floor": "1F",
+    "floor_images": {
+      "1F": "/data/images/omicron_2_1f.png"
+    },
     "coords": [
       [
         35.3888117,
@@ -435,6 +463,10 @@
     "layer_type": "polygon",
     "building": "Lambda Building",
     "floor": "1F, 2F",
+    "floor_images": {
+      "1F": "/data/images/lambda_1_1f.png",
+      "2F": "/data/images/lambda_1_2f.png"
+    },
     "coords": [
       [
         35.389107,
@@ -464,6 +496,9 @@
     "layer_type": "polygon",
     "building": "Lambda Building",
     "floor": "1F",
+    "floor_images": {
+      "1F": "/data/images/lambda_2_1f.png"
+    },
     "coords": [
       [
         35.3891498,
@@ -529,7 +564,12 @@
     "name": "Media Center",
     "layer_type": "polygon",
     "building": "Media Center",
-    "floor": "1F",
+    "floor": "1F, 2F, 3F",
+    "floor_images": {
+      "1F": "/data/images/media_center_1f.png",
+      "2F": "/data/images/media_center_2f.png",
+      "3F": "/data/images/media_center_3f.png"
+    },
     "coords": [
       [
         35.3879265,
@@ -651,6 +691,10 @@
     "layer_type": "polygon",
     "building": "Omega Building",
     "floor": "1F, 2F",
+    "floor_images": {
+      "1F": "/data/images/omega_1f.png",
+      "2F": "/data/images/omega_2f.png"
+    },
     "coords": [
       [
         35.3880844,
@@ -719,7 +763,7 @@
     "name": "Sigma Building",
     "layer_type": "polygon",
     "building": "Sigma Building",
-    "floor": "1F, 2F",
+    "floor": "B1F, 1F, 2F",
     "coords": [
       [
         35.3874618,
