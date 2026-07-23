@@ -34,6 +34,11 @@ let allPointFacilities = []; // Holds point items until building is called
 let itemLayerGroup = null; // Tracks shown items on map
 let categoryFilterLayerGroup = null; // Layer for global category filters (e.g., water fountains)
 
+let currentBuildingFloors = [];
+let currentFloorItems = [];  
+let activeItemFilter = null
+
+
 window.onload = function() {
     map = L.map('map', {
         center: MAP_CONFIG.center,
@@ -315,7 +320,7 @@ function filterPOIsByCategory(category) {
                 opacity: 0.85,
                 className: 'poi-tooltip'
             });
-            
+
         updateLabelVisibility();
     });
 }
@@ -398,10 +403,8 @@ function showItemsForBuilding(buildingName) {
             });
 
         updateLabelVisibility();
-    });
+    }); 
 }
-
-let currentBuildingFloors = [];
 
 function openBuildingPanel(item) {
     document.getElementById('building-panel-name').textContent = item.name || 'Unnamed building';
@@ -441,15 +444,62 @@ function renderFloorContent(floor) {
     const classroomsEl = document.getElementById('building-panel-classrooms');
     const itemsEl = document.getElementById('building-panel-items');
     const imageEl = document.getElementById('building-floor-image');
+    const filterContainer = document.getElementById('building-item-filters');
 
     classroomsEl.innerHTML = (floor.classrooms || [])
         .map(c => `<li>${c}</li>`).join('') || '<li style="color:#999;">None listed</li>';
 
-    itemsEl.innerHTML = (floor.items || [])
-        .map(i => `<li>${i}</li>`).join('') || '<li style="color:#999;">None listed</li>';
-
     imageEl.src = floor.image_url || `https://placehold.co/600x375?text=${encodeURIComponent(floor.label || 'Floor Plan')}`;
 
+    currentFloorItems = floor.items || [];
+    activeItemFilter = null;
+
+    // Build filter buttons from the distinct types present on this floor
+    const types = [];
+    currentFloorItems.forEach(item => {
+        if (!types.includes(item.layer_type)) types.push(item.layer_type);
+    });
+
+    filterContainer.innerHTML = '';
+    types.forEach(type => {
+        const btn = document.createElement('button');
+        btn.className = 'item-filter-btn';
+        btn.textContent = POI_ICONS[type] || '📍';  
+        btn.title = type.replace(/_/g, ' ');   
+        btn.addEventListener('click', () => {
+            if (activeItemFilter === type) {
+                activeItemFilter = null; // clicking the active filter again clears it
+            } else {
+                activeItemFilter = type;
+            }
+            updateFilterButtonStyles();
+            renderItemsList();
+        });
+        filterContainer.appendChild(btn);
+    });
+
+    renderItemsList();
+}
+
+function updateFilterButtonStyles() {
+    btn.dataset.type = type;
+    document.querySelectorAll('.item-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.type === activeItemFilter);
+    });
+}
+
+function renderItemsList() {
+    const itemsEl = document.getElementById('building-panel-items');
+
+    let itemsToShow;
+    if (activeItemFilter) {
+        itemsToShow = currentFloorItems.filter(item => item.layer_type === activeItemFilter);
+    } else {
+        itemsToShow = currentFloorItems;
+    }
+
+    itemsEl.innerHTML = itemsToShow.map(item => `<li>${item.name}</li>`).join('')
+        || '<li style="color:#999;">None listed</li>';
 }
 
 function closeBuildingPanel() {
@@ -483,10 +533,8 @@ function transformFacilities(facilities) {
             if (!groupedClassroomsByBuilding[buildingKey][floorKey]) groupedClassroomsByBuilding[buildingKey][floorKey] = [];
             groupedClassroomsByBuilding[buildingKey][floorKey].push(f.name);
         } else {
-            // Group Items/Facilities
-            if (!groupedByBuilding[buildingKey]) groupedByBuilding[buildingKey] = {};
             if (!groupedByBuilding[buildingKey][floorKey]) groupedByBuilding[buildingKey][floorKey] = [];
-            groupedByBuilding[buildingKey][floorKey].push(f.name);
+            groupedByBuilding[buildingKey][floorKey].push({ name: f.name, layer_type: f.layer_type }); // CHANGED: store object, not just name
         }
     });
 
