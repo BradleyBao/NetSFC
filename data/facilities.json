@@ -900,5 +900,463 @@
         139.4255095
       ]
     ]
+  },
+  {
+    "id": 37,
+    "name": "Kappa 11",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "1F"
+  },
+  {
+    "id": 38,
+    "name": "Kappa 12",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "1F"
+  },
+  {
+    "id": 39,
+    "name": "Kappa 21",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "2F"
+  },
+  {
+    "id": 40,
+    "name": "Kappa 22",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "2F"
+  },
+  {
+    "id": 41,
+    "name": "Kappa 23",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "2F"
+  },
+  {
+    "id": 42,
+    "name": "Kappa 13",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "1F"
+  },
+  {
+    "id": 43,
+    "name": "Kappa 14",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "1F"
+  },
+  {
+    "id": 44,
+    "name": "Kappa 15",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "1F"
+  },
+  {
+    "id": 45,
+    "name": "Kappa 16",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "1F"
+  },
+  {
+    "id": 46,
+    "name": "Kappa 17",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "1F"
+  },
+  {
+    "id": 47,
+    "name": "Kappa 18",
+    "layer_type": "classroom",
+    "building": "Kappa Building",
+    "floor": "1F"
+  },
+  {
+    "id": 48,
+    "name": "Epsilon 11",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "1F"
+  },
+  {
+    "id": 49,
+    "name": "Epsilon 12",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "1F"
+  },
+  {
+    "id": 50,
+    "name": "Epsilon 21",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "2F"
+  },
+  {
+    "id": 51,
+    "name": "Epsilon 22",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "2F"
+  },
+  {
+    "id": 52,
+    "name": "Epsilon 23",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "2F"
+  },
+  {
+    "id": 53,
+    "name": "Epsilon 24",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "2F"
+  },
+  {
+    "id": 54,
+    "name": "Epsilon 13",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "1F"
+  },
+  {
+    "id": 55,
+    "name": "Epsilon 14",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "1F"
+  },
+  {
+    "id": 56,
+    "name": "Epsilon 15",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "1F"
+  },
+  {
+    "id": 57,
+    "name": "Epsilon 16",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "1F"
+  },
+  {
+    "id": 58,
+    "name": "Epsilon 16",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "1F"
+  },
+  {
+    "id": 59,
+    "name": "Epsilon 17",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "1F"
+  },
+  {
+    "id": 60,
+    "name": "Epsilon 18",
+    "layer_type": "classroom",
+    "building": "Epsilon Building",
+    "floor": "1F"
+  },
+  {
+    "id": 61,
+    "name": "Iota 11",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "1F"
+  },
+  {
+    "id": 62,
+    "name": "Iota 12",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "1F"
+  },
+  {
+    "id": 63,
+    "name": "Iota 21",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "2F"
+  },
+  {
+    "id": 64,
+    "name": "Iota 22",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "2F"
+  },
+  {
+    "id": 65,
+    "name": "Iota 23",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "2F"
+  },
+  {
+    "id": 66,
+    "name": "Iota 13",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "1F"
+  },
+  {
+    "id": 67,
+    "name": "Iota 14",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "1F"
+  },
+  {
+    "id": 68,
+    "name": "Iota 15",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "1F"
+  },
+  {
+    "id": 69,
+    "name": "Iota 16",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "1F"
+  },
+  {
+    "id": 70,
+    "name": "Iota 17",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "1F"
+  },
+  {
+    "id": 71,
+    "name": "Iota 18",
+    "layer_type": "classroom",
+    "building": "Iota Building",
+    "floor": "1F"
+  },
+  {
+    "id": 72,
+    "name": "Omicron 11",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "1F"
+  },
+  {
+    "id": 73,
+    "name": "Omicron 12",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "1F"
+  },
+  {
+    "id": 74,
+    "name": "Omicron 21",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "2F"
+  },
+  {
+    "id": 75,
+    "name": "Omicron 22",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "2F"
+  },
+  {
+    "id": 76,
+    "name": "Omicron 23",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "2F"
+  },
+  {
+    "id": 77,
+    "name": "Omicron 24",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "2F"
+  },
+  {
+    "id": 78,
+    "name": "Omicron 13",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "1F"
+  },
+  {
+    "id": 79,
+    "name": "Omicron 14",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "1F"
+  },
+  {
+    "id": 80,
+    "name": "Omicron 15",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "1F"
+  },
+  {
+    "id": 81,
+    "name": "Omicron 16",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "1F"
+  },
+  {
+    "id": 82,
+    "name": "Omicron 17",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "1F"
+  },
+  {
+    "id": 83,
+    "name": "Omicron 18",
+    "layer_type": "classroom",
+    "building": "Omicron Building",
+    "floor": "1F"
+  },
+  {
+    "id": 84,
+    "name": "Lambda 11",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "1F"
+  },
+  {
+    "id": 85,
+    "name": "Lambda 12",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "1F"
+  },
+  {
+    "id": 86,
+    "name": "Lambda 13",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "1F"
+  },
+  {
+    "id": 87,
+    "name": "Lambda 21",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "2F"
+  },
+  {
+    "id": 88,
+    "name": "Lambda 22",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "2F"
+  },
+  {
+    "id": 89,
+    "name": "Lambda 23",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "2F"
+  },
+  {
+    "id": 90,
+    "name": "Lambda 24",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "2F"
+  },
+  {
+    "id": 91,
+    "name": "Lambda 25",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "2F"
+  },
+  {
+    "id": 92,
+    "name": "Lambda 14",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "1F"
+  },
+  {
+    "id": 93,
+    "name": "Lambda 15",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "1F"
+  },
+  {
+    "id": 94,
+    "name": "Lambda 16",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "1F"
+  },
+  {
+    "id": 95,
+    "name": "Lambda 17",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "1F"
+  },
+  {
+    "id": 96,
+    "name": "Lambda 18",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "1F"
+  },
+  {
+    "id": 97,
+    "name": "Lambda 19",
+    "layer_type": "classroom",
+    "building": "Lambda Building",
+    "floor": "1F"
+  },
+  {
+    "id": 98,
+    "name": "Omega 11",
+    "layer_type": "classroom",
+    "building": "Omega Building",
+    "floor": "1F"
+  },
+  {
+    "id": 99,
+    "name": "Omega 12",
+    "layer_type": "classroom",
+    "building": "Omega Building",
+    "floor": "1F"
+  },
+  {
+    "id": 100,
+    "name": "Omega 21",
+    "layer_type": "classroom",
+    "building": "Omega Building",
+    "floor": "2F"
+  },
+  {
+    "id": 101,
+    "name": "Omega 22",
+    "layer_type": "classroom",
+    "building": "Omega Building",
+    "floor": "2F"
   }
+
+
+
 ]

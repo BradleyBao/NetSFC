@@ -271,10 +271,16 @@ function filterPOIsByCategory(category) {
         map.removeLayer(categoryFilterLayerGroup);
         categoryFilterLayerGroup = null;
     }
-    if (!category || category === 'all') return;
+    if (!category) return;
 
     categoryFilterLayerGroup = L.layerGroup().addTo(map);
-    const matchingFacilities = allPointFacilities.filter(f => f.layer_type === category);
+
+    let matchingFacilities;
+    if (category === 'all') {
+        matchingFacilities = allPointFacilities;
+    } else {
+        matchingFacilities = allPointFacilities.filter(f => f.layer_type === category);
+    }
 
     matchingFacilities.forEach(item => {
         if (!item.coords || item.coords.length < 2) return;
@@ -438,13 +444,23 @@ function transformFacilities(facilities) {
 
     // Group point facilities by building -> floor -> items
     const groupedByBuilding = {};
+    const groupedClassroomsByBuilding = {};
     pointFacilities.forEach(f => {
         const buildingKey = f.building;
         if (!buildingKey) return;
         if (!groupedByBuilding[buildingKey]) groupedByBuilding[buildingKey] = {};
         const floorKey = f.floor || 'Unspecified';
-        if (!groupedByBuilding[buildingKey][floorKey]) groupedByBuilding[buildingKey][floorKey] = [];
-        groupedByBuilding[buildingKey][floorKey].push(f.name);
+        if (f.layer_type === 'classroom') {
+            // Group Classrooms
+            if (!groupedClassroomsByBuilding[buildingKey]) groupedClassroomsByBuilding[buildingKey] = {};
+            if (!groupedClassroomsByBuilding[buildingKey][floorKey]) groupedClassroomsByBuilding[buildingKey][floorKey] = [];
+            groupedClassroomsByBuilding[buildingKey][floorKey].push(f.name);
+        } else {
+            // Group Items/Facilities
+            if (!groupedByBuilding[buildingKey]) groupedByBuilding[buildingKey] = {};
+            if (!groupedByBuilding[buildingKey][floorKey]) groupedByBuilding[buildingKey][floorKey] = [];
+            groupedByBuilding[buildingKey][floorKey].push(f.name);
+        }
     });
 
     // Building polygons -> match placePOIs' expected shape
@@ -452,6 +468,7 @@ function transformFacilities(facilities) {
         const coords = poly.coords;
         const buildingName = poly.building;
         const floorMap = groupedByBuilding[poly.building] || {};
+        const classroomMap = groupedClassroomsByBuilding[poly.building] || {};
 
         let declaredFloors = [];
         if (poly.floor) {
@@ -477,10 +494,15 @@ function transformFacilities(facilities) {
             }
         }
 
+        const classroomFloors = Object.keys(classroomMap);
+        for (let i = 0; i < classroomFloors.length; i++) {
+            if (!floorLabels.includes(classroomFloors[i])) floorLabels.push(classroomFloors[i]);
+        }
+
         const floors = floorLabels.map(floorLabel => ({
             level: floorLabel,
             label: floorLabel,
-            classrooms: [],
+            classrooms: classroomMap[floorLabel] || [],
             items: floorMap[floorLabel] || [],
             image_url: (poly.floor_images && poly.floor_images[floorLabel]) || null
         }));
@@ -495,7 +517,7 @@ function transformFacilities(facilities) {
         };
     });
 
-    const pointItems = pointFacilities.filter(f => f.coords); 
+    const pointItems = pointFacilities.filter(f => f.coords && f.layer_type !== 'classroom'); 
 
     return { buildingItems, pointItems };
 }
