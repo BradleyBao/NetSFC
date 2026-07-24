@@ -219,18 +219,27 @@ function initGeolocation() {
                 userLocationMarker = L.marker(currentUserLatLng, { icon: userIcon }).addTo(map);
             }
 
-            if (userAccuracyCircle) {
-                userAccuracyCircle.setLatLng(currentUserLatLng);
-                userAccuracyCircle.setRadius(accuracy);
+            const MAX_ACCURACY_THRESHOLD = 500;
+
+            if (accuracy <= MAX_ACCURACY_THRESHOLD) {
+                if (userAccuracyCircle) {
+                    userAccuracyCircle.setLatLng(currentUserLatLng);
+                    userAccuracyCircle.setRadius(accuracy);
+                } else {
+                    userAccuracyCircle = L.circle(currentUserLatLng, {
+                        radius: accuracy,
+                        color: '#1a73e8',
+                        fillColor: '#1a73e8',
+                        fillOpacity: 0.12,
+                        weight: 1.5,
+                        interactive: false
+                    }).addTo(map);
+                }
             } else {
-                userAccuracyCircle = L.circle(currentUserLatLng, {
-                    radius: accuracy,
-                    color: '#1a73e8',
-                    fillColor: '#1a73e8',
-                    fillOpacity: 0.12,
-                    weight: 1.5,
-                    interactive: false
-                }).addTo(map);
+                if (userAccuracyCircle) {
+                    map.removeLayer(userAccuracyCircle);
+                    userAccuracyCircle = null;
+                }
             }
 
             // Locate user on first location update if user is in the campus bounds
