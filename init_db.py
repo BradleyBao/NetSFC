@@ -15,6 +15,7 @@ class Facility(TypedDict):
     building: str | None
     floor: str | None
     coords: List[Any]
+    floor_images: dict[str, str] | None
 
 
 def load_facilities_json() -> list[Facility]:
@@ -34,13 +35,13 @@ def load_facilities_json() -> list[Facility]:
         id_value = item.get("id")
         type_value = item.get("layer_type")
         name_value = item.get("name")
-        coords: List[float] | None = item.get("coords")
+        coords = item.get("coords")
 
         if (
             not isinstance(id_value, int)
             or not isinstance(type_value, str)
             or not isinstance(name_value, str)
-            or not isinstance(coords, list)
+            or (coords is not None and not isinstance(coords, list))
         ):
             logger.warning(f"Skipping invalid facility: {item}")
             continue
@@ -51,7 +52,8 @@ def load_facilities_json() -> list[Facility]:
             "name": name_value,
             "building": item.get("building"),
             "floor": item.get("floor"),
-            "coords": coords,
+            "coords": coords if isinstance(coords, list) else [],
+            "floor_images": item.get("floor_images"),
         })
 
     return cleaned
@@ -93,13 +95,15 @@ def init_db(db_name: str) -> None:
             name TEXT NOT NULL,
             building TEXT,
             floor TEXT,
-            coords TEXT NOT NULL
+            coords TEXT NOT NULL,
+            floor_images TEXT
         )
     """)
 
     ensure_column(cursor, 'campus_pois', 'building', 'TEXT')
     ensure_column(cursor, 'campus_pois', 'floor', 'TEXT')
     ensure_column(cursor, 'campus_pois', 'coords', 'TEXT DEFAULT "[]"')
+    ensure_column(cursor, 'campus_pois', 'floor_images', 'TEXT DEFAULT "{}"')
 
     RUNTIME: str | None = os.getenv("RUNTIME")
     if RUNTIME and RUNTIME.upper() == "DEBUG":
@@ -109,8 +113,8 @@ def init_db(db_name: str) -> None:
     for facility in facilities:
         cursor.execute("""
             INSERT OR REPLACE INTO campus_pois 
-            (id, layer_type, name, building, floor, coords)
-            VALUES (?, ?, ?, ?, ?, ?)
+            (id, layer_type, name, building, floor, coords, floor_images)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (
             facility["id"],
             facility["layer_type"],
@@ -118,6 +122,7 @@ def init_db(db_name: str) -> None:
             facility["building"],
             facility["floor"],
             json.dumps(facility["coords"], ensure_ascii=False),
+            json.dumps(facility.get("floor_images") or {}, ensure_ascii=False),
         ))
 
     conn.commit()

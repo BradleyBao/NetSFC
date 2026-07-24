@@ -36,7 +36,7 @@ let categoryFilterLayerGroup = null; // Layer for global category filters (e.g.,
 
 let currentBuildingFloors = [];
 let currentFloorItems = [];  
-let activeItemFilter = null
+let activeItemFilter = null;
 
 
 window.onload = function() {
@@ -190,7 +190,7 @@ function getPolygonCentroid(coords) {
     return [total.lat / coords.length, total.lng / coords.length];
 }
 
-// Get user locaton
+// Get user location
 function initGeolocation() {
     const locateBtn = document.getElementById('locate-btn');
 
@@ -276,7 +276,7 @@ function initCategoryChips() {
 
     chipBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            const isAlreadyActive = btn.classList.contains('active'); // ADD THIS — must run BEFORE clearing classes
+            const isAlreadyActive = btn.classList.contains('active');
 
             chipBtns.forEach(b => b.classList.remove('active'));
 
@@ -379,7 +379,6 @@ function updateLabelVisibility() {
 }
 
 function showItemsForBuilding(buildingName) {
-    // clear whatever items were shown for the previously clicked building
     if (itemLayerGroup) {
         map.removeLayer(itemLayerGroup);
         itemLayerGroup = null;
@@ -408,7 +407,7 @@ function showItemsForBuilding(buildingName) {
         });
 
         L.marker([item.coords[0], item.coords[1]], { icon: poiIcon, interactive: true })
-            .addTo(itemLayerGroup)   // add to the group, not directly to map
+            .addTo(itemLayerGroup)
             .bindTooltip(labelText, {
                 direction: 'top',
                 offset: [0, -12],
@@ -427,13 +426,16 @@ function openBuildingPanel(item) {
 
     currentBuildingFloors = item.floors || [];
 
-    showItemsForBuilding(item.building || item.name); // Filter items by its building
+    showItemsForBuilding(item.building || item.name);
 
     const tabsContainer = document.getElementById('building-floor-tabs');
     tabsContainer.innerHTML = '';
 
+    const classroomsEl = document.getElementById('building-panel-classrooms');
+    classroomsEl.className = 'gm-pills-list';
+
     if (currentBuildingFloors.length === 0) {
-        document.getElementById('building-panel-classrooms').innerHTML = '';
+        classroomsEl.innerHTML = '<li style="color:#999; background:none; padding:0;">None listed</li>';
         document.getElementById('building-panel-items').innerHTML = '';
     } else {
         currentBuildingFloors.forEach((floor, index) => {
@@ -461,15 +463,18 @@ function renderFloorContent(floor) {
     const imageEl = document.getElementById('building-floor-image');
     const filterContainer = document.getElementById('building-item-filters');
 
-    classroomsEl.innerHTML = (floor.classrooms || [])
-        .map(c => `<li>${c}</li>`).join('') || '<li style="color:#999;">None listed</li>';
+    classroomsEl.className = 'gm-pills-list';
+    if (floor.classrooms && floor.classrooms.length > 0) {
+        classroomsEl.innerHTML = floor.classrooms.map(c => `<li>${c}</li>`).join('');
+    } else {
+        classroomsEl.innerHTML = '<li style="color:#999; background:none; padding:0;">None listed</li>';
+    }
 
     imageEl.src = floor.image_url || `https://placehold.co/600x375?text=${encodeURIComponent(floor.label || 'Floor Plan')}`;
 
     currentFloorItems = floor.items || [];
     activeItemFilter = null;
 
-    // Build filter buttons from the distinct types present on this floor
     const types = [];
     currentFloorItems.forEach(item => {
         if (!types.includes(item.layer_type)) types.push(item.layer_type);
@@ -479,12 +484,12 @@ function renderFloorContent(floor) {
     types.forEach(type => {
         const btn = document.createElement('button');
         btn.className = 'item-filter-btn';
-        btn.dataset.type = type;
+        btn.dataset.type = type; // 💡 优化项 6: 绑好 dataset.type 确保样式切换不报 ReferenceError
         btn.textContent = POI_ICONS[type] || '📍';  
         btn.title = type.replace(/_/g, ' ');   
         btn.addEventListener('click', () => {
             if (activeItemFilter === type) {
-                activeItemFilter = null; // clicking the active filter again clears it
+                activeItemFilter = null;
             } else {
                 activeItemFilter = type;
             }
@@ -543,13 +548,12 @@ function transformFacilities(facilities) {
         if (!groupedByBuilding[buildingKey]) groupedByBuilding[buildingKey] = {};
         const floorKey = f.floor || 'Unspecified';
         if (f.layer_type === 'classroom') {
-            // Group Classrooms
             if (!groupedClassroomsByBuilding[buildingKey]) groupedClassroomsByBuilding[buildingKey] = {};
             if (!groupedClassroomsByBuilding[buildingKey][floorKey]) groupedClassroomsByBuilding[buildingKey][floorKey] = [];
             groupedClassroomsByBuilding[buildingKey][floorKey].push(f.name);
         } else {
             if (!groupedByBuilding[buildingKey][floorKey]) groupedByBuilding[buildingKey][floorKey] = [];
-            groupedByBuilding[buildingKey][floorKey].push({ name: f.name, layer_type: f.layer_type }); // CHANGED: store object, not just name
+            groupedByBuilding[buildingKey][floorKey].push({ name: f.name, layer_type: f.layer_type });
         }
     });
 

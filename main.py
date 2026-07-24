@@ -48,6 +48,7 @@ class POIResponse(BaseModel):
     building: str | None = None
     floor: str | None = None
     coords: list[Any]
+    floor_images: dict[str, str] | None = None
 
 class ConnectionManager():
     def __init__(self):
@@ -121,7 +122,7 @@ async def get_all_pois():
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         cursor.execute('''
-            SELECT id, name, layer_type, building, floor, coords
+            SELECT id, name, layer_type, building, floor, coords, floor_images
             FROM campus_pois
         ''')
         rows = cursor.fetchall()
@@ -134,6 +135,7 @@ async def get_all_pois():
                 "building": row[3],
                 "floor": row[4],
                 "coords": json.loads(row[5]) if row[5] else [],
+                "floor_images": json.loads(row[6]) if row[6] else {},
             }
             for row in rows
         ]
@@ -150,7 +152,7 @@ async def get_layer_items(layerType: str):
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         cursor.execute('''
-            SELECT id, name, layer_type, building, floor, coords
+            SELECT id, name, layer_type, building, floor, coords, floor_images
             FROM campus_pois 
             WHERE layer_type = ?
         ''', (layerType,))
@@ -164,6 +166,7 @@ async def get_layer_items(layerType: str):
                 "building": row[3],
                 "floor": row[4],
                 "coords": json.loads(row[5]) if row[5] else [],
+                "floor_images": json.loads(row[6]) if row[6] else {},
             }
             for row in rows
         ]
