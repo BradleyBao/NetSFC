@@ -1,0 +1,24 @@
+name: Sync Map Frontend to ais-web
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout NetSFC
+        uses: actions/checkout@v4
+
+      - name: Push Map Frontend to ais-web
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.ACTION_TOKEN }}
+        with:
+          source-directory: 'frontend/src' 
+          destination-github-username-repository: 'Keio-SFC-AIS/ais-web'
+          target-directory: 'map'
+          user-email: 'action@github.com'
+          target-branch: 'main'
