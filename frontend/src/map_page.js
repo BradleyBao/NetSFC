@@ -19,7 +19,7 @@ const POI_ICONS = {
     building: '🏢'
 };
 
-const LABEL_ZOOM_THRESHOLD = 19;
+const LABEL_ZOOM_THRESHOLD = 21;
 
 let map;
 let heatLayer;
@@ -479,6 +479,7 @@ function renderFloorContent(floor) {
     types.forEach(type => {
         const btn = document.createElement('button');
         btn.className = 'item-filter-btn';
+        btn.dataset.type = type;
         btn.textContent = POI_ICONS[type] || '📍';  
         btn.title = type.replace(/_/g, ' ');   
         btn.addEventListener('click', () => {
@@ -497,7 +498,6 @@ function renderFloorContent(floor) {
 }
 
 function updateFilterButtonStyles() {
-    btn.dataset.type = type;
     document.querySelectorAll('.item-filter-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.type === activeItemFilter);
     });
