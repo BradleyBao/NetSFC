@@ -488,7 +488,6 @@ function renderFloorContent(floor) {
 }
 
 function updateFilterButtonStyles() {
-    btn.dataset.type = type;
     document.querySelectorAll('.item-filter-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.type === activeItemFilter);
     });
