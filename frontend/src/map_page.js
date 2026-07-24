@@ -89,8 +89,8 @@ window.onload = function() {
 };
 
 function loadPOIs() {
-    // const url = `${window.ENV.API_HOST}/api/pois`;
-    fetch("/data/facilities.json")
+    const url = `${window.ENV.API_HOST}/api/pois`;
+    fetch(url)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);
