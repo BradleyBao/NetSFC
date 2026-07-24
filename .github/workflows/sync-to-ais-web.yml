@@ -18,7 +18,8 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.ACTION_TOKEN }}
         with:
           source-directory: 'frontend/src' 
-          destination-github-username-repository: 'Keio-SFC-AIS/ais-web'
+          destination-github-username: 'Keio-SFC-AIS'
+          destination-repository-name: 'ais-web'
           target-directory: 'map'
           user-email: 'action@github.com'
           target-branch: 'main'
