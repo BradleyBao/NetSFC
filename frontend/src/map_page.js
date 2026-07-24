@@ -470,6 +470,7 @@ function renderFloorContent(floor) {
     types.forEach(type => {
         const btn = document.createElement('button');
         btn.className = 'item-filter-btn';
+        btn.dataset.type = type;
         btn.textContent = POI_ICONS[type] || '📍';  
         btn.title = type.replace(/_/g, ' ');   
         btn.addEventListener('click', () => {
