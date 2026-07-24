@@ -19,7 +19,7 @@ const POI_ICONS = {
     building: '🏢'
 };
 
-const LABEL_ZOOM_THRESHOLD = 19;
+const LABEL_ZOOM_THRESHOLD = 21;
 
 let map;
 let heatLayer;
