@@ -19,6 +19,8 @@ const POI_ICONS = {
     building: '🏢'
 };
 
+const LABEL_ZOOM_THRESHOLD = 21;
+
 let map;
 let heatLayer;
 let heatPoints = [];
@@ -31,6 +33,11 @@ let isFirstLocation = true;
 let allPointFacilities = []; // Holds point items until building is called
 let itemLayerGroup = null; // Tracks shown items on map
 let categoryFilterLayerGroup = null; // Layer for global category filters (e.g., water fountains)
+
+let currentBuildingFloors = [];
+let currentFloorItems = [];  
+let activeItemFilter = null
+
 
 window.onload = function() {
     map = L.map('map', {
@@ -72,6 +79,9 @@ window.onload = function() {
         gradient: { 0.4: 'blue', 0.7: 'orange', 1.0: 'red' }
     }).addTo(map);
 
+    map.on('zoomend', updateLabelVisibility);
+
+    updateLabelVisibility();
     loadPOIs();
     initGeolocation();
     initSettingsModal();
@@ -79,8 +89,8 @@ window.onload = function() {
 };
 
 function loadPOIs() {
-    const url = `${window.ENV.API_HOST}/api/pois`;
-    fetch(url)
+    // const url = `${window.ENV.API_HOST}/api/pois`;
+    fetch("/data/facilities.json")
         .then(response => {
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);
@@ -107,7 +117,7 @@ function placePOIs(items) {
         // Handle Items
         if (item.coords.length === 2 && typeof item.coords[0] === 'number' && typeof item.coords[1] === 'number') {
             const icon = POI_ICONS[item.layer_type] || '📍';
-            const labelText = item.name || item.layer_type.replace(/_/g, ' ');
+            const labelText = item.layer_type.replace(/_/g, ' ');
             const html = `
                 <div class="poi-label">
                     <span class="poi-icon">${icon}</span>
@@ -209,18 +219,27 @@ function initGeolocation() {
                 userLocationMarker = L.marker(currentUserLatLng, { icon: userIcon }).addTo(map);
             }
 
-            if (userAccuracyCircle) {
-                userAccuracyCircle.setLatLng(currentUserLatLng);
-                userAccuracyCircle.setRadius(accuracy);
+            const MAX_ACCURACY_THRESHOLD = 500;
+
+            if (accuracy <= MAX_ACCURACY_THRESHOLD) {
+                if (userAccuracyCircle) {
+                    userAccuracyCircle.setLatLng(currentUserLatLng);
+                    userAccuracyCircle.setRadius(accuracy);
+                } else {
+                    userAccuracyCircle = L.circle(currentUserLatLng, {
+                        radius: accuracy,
+                        color: '#1a73e8',
+                        fillColor: '#1a73e8',
+                        fillOpacity: 0.12,
+                        weight: 1.5,
+                        interactive: false
+                    }).addTo(map);
+                }
             } else {
-                userAccuracyCircle = L.circle(currentUserLatLng, {
-                    radius: accuracy,
-                    color: '#1a73e8',
-                    fillColor: '#1a73e8',
-                    fillOpacity: 0.12,
-                    weight: 1.5,
-                    interactive: false
-                }).addTo(map);
+                if (userAccuracyCircle) {
+                    map.removeLayer(userAccuracyCircle);
+                    userAccuracyCircle = null;
+                }
             }
 
             // Locate user on first location update if user is in the campus bounds
@@ -257,11 +276,17 @@ function initCategoryChips() {
 
     chipBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            chipBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            const isAlreadyActive = btn.classList.contains('active'); // ADD THIS — must run BEFORE clearing classes
 
-            const category = btn.getAttribute('data-category');
-            filterPOIsByCategory(category);
+            chipBtns.forEach(b => b.classList.remove('active'));
+
+            if (isAlreadyActive) {
+                filterPOIsByCategory(null);
+            } else {
+                btn.classList.add('active');
+                const category = btn.getAttribute('data-category');
+                filterPOIsByCategory(category);
+            }
         });
     });
 }
@@ -271,16 +296,22 @@ function filterPOIsByCategory(category) {
         map.removeLayer(categoryFilterLayerGroup);
         categoryFilterLayerGroup = null;
     }
-    if (!category || category === 'all') return;
+    if (!category) return;
 
     categoryFilterLayerGroup = L.layerGroup().addTo(map);
-    const matchingFacilities = allPointFacilities.filter(f => f.layer_type === category);
+
+    let matchingFacilities;
+    if (category === 'all') {
+        matchingFacilities = allPointFacilities;
+    } else {
+        matchingFacilities = allPointFacilities.filter(f => f.layer_type === category);
+    }
 
     matchingFacilities.forEach(item => {
         if (!item.coords || item.coords.length < 2) return;
 
         const icon = POI_ICONS[item.layer_type] || '📍';
-        const labelText = item.name || item.layer_type.replace(/_/g, ' ');
+        const labelText = item.layer_type.replace(/_/g, ' ');
         const html = `
             <div class="poi-label">
                 <span class="poi-icon">${icon}</span>
@@ -304,6 +335,8 @@ function filterPOIsByCategory(category) {
                 opacity: 0.85,
                 className: 'poi-tooltip'
             });
+
+        updateLabelVisibility();
     });
 }
 
@@ -327,6 +360,24 @@ function initSettingsModal() {
     }
 }
 
+function updateLabelVisibility() {
+    let showLabels;
+    if (map.getZoom() >= LABEL_ZOOM_THRESHOLD) {
+        showLabels = true;
+    } else {
+        showLabels = false;
+    }
+
+    const labels = document.querySelectorAll('.poi-title');
+    labels.forEach(el => {
+        if (showLabels) {
+            el.style.display = 'inline';
+        } else {
+            el.style.display = 'none';
+        }
+    });
+}
+
 function showItemsForBuilding(buildingName) {
     // clear whatever items were shown for the previously clicked building
     if (itemLayerGroup) {
@@ -341,7 +392,7 @@ function showItemsForBuilding(buildingName) {
 
     matchingItems.forEach(item => {
         const icon = POI_ICONS[item.layer_type] || '📍';
-        const labelText = item.name || item.layer_type.replace(/_/g, ' ');
+        const labelText = item.layer_type.replace(/_/g, ' ');
         const html = `
             <div class="poi-label">
                 <span class="poi-icon">${icon}</span>
@@ -365,10 +416,10 @@ function showItemsForBuilding(buildingName) {
                 opacity: 0.85,
                 className: 'poi-tooltip'
             });
-    });
-}
 
-let currentBuildingFloors = [];
+        updateLabelVisibility();
+    }); 
+}
 
 function openBuildingPanel(item) {
     document.getElementById('building-panel-name').textContent = item.name || 'Unnamed building';
@@ -408,15 +459,62 @@ function renderFloorContent(floor) {
     const classroomsEl = document.getElementById('building-panel-classrooms');
     const itemsEl = document.getElementById('building-panel-items');
     const imageEl = document.getElementById('building-floor-image');
+    const filterContainer = document.getElementById('building-item-filters');
 
     classroomsEl.innerHTML = (floor.classrooms || [])
         .map(c => `<li>${c}</li>`).join('') || '<li style="color:#999;">None listed</li>';
 
-    itemsEl.innerHTML = (floor.items || [])
-        .map(i => `<li>${i}</li>`).join('') || '<li style="color:#999;">None listed</li>';
-
     imageEl.src = floor.image_url || `https://placehold.co/600x375?text=${encodeURIComponent(floor.label || 'Floor Plan')}`;
 
+    currentFloorItems = floor.items || [];
+    activeItemFilter = null;
+
+    // Build filter buttons from the distinct types present on this floor
+    const types = [];
+    currentFloorItems.forEach(item => {
+        if (!types.includes(item.layer_type)) types.push(item.layer_type);
+    });
+
+    filterContainer.innerHTML = '';
+    types.forEach(type => {
+        const btn = document.createElement('button');
+        btn.className = 'item-filter-btn';
+        btn.dataset.type = type;
+        btn.textContent = POI_ICONS[type] || '📍';  
+        btn.title = type.replace(/_/g, ' ');   
+        btn.addEventListener('click', () => {
+            if (activeItemFilter === type) {
+                activeItemFilter = null; // clicking the active filter again clears it
+            } else {
+                activeItemFilter = type;
+            }
+            updateFilterButtonStyles();
+            renderItemsList();
+        });
+        filterContainer.appendChild(btn);
+    });
+
+    renderItemsList();
+}
+
+function updateFilterButtonStyles() {
+    document.querySelectorAll('.item-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.type === activeItemFilter);
+    });
+}
+
+function renderItemsList() {
+    const itemsEl = document.getElementById('building-panel-items');
+
+    let itemsToShow;
+    if (activeItemFilter) {
+        itemsToShow = currentFloorItems.filter(item => item.layer_type === activeItemFilter);
+    } else {
+        itemsToShow = currentFloorItems;
+    }
+
+    itemsEl.innerHTML = itemsToShow.map(item => `<li>${item.name}</li>`).join('')
+        || '<li style="color:#999;">None listed</li>';
 }
 
 function closeBuildingPanel() {
@@ -438,13 +536,21 @@ function transformFacilities(facilities) {
 
     // Group point facilities by building -> floor -> items
     const groupedByBuilding = {};
+    const groupedClassroomsByBuilding = {};
     pointFacilities.forEach(f => {
         const buildingKey = f.building;
         if (!buildingKey) return;
         if (!groupedByBuilding[buildingKey]) groupedByBuilding[buildingKey] = {};
         const floorKey = f.floor || 'Unspecified';
-        if (!groupedByBuilding[buildingKey][floorKey]) groupedByBuilding[buildingKey][floorKey] = [];
-        groupedByBuilding[buildingKey][floorKey].push(f.name);
+        if (f.layer_type === 'classroom') {
+            // Group Classrooms
+            if (!groupedClassroomsByBuilding[buildingKey]) groupedClassroomsByBuilding[buildingKey] = {};
+            if (!groupedClassroomsByBuilding[buildingKey][floorKey]) groupedClassroomsByBuilding[buildingKey][floorKey] = [];
+            groupedClassroomsByBuilding[buildingKey][floorKey].push(f.name);
+        } else {
+            if (!groupedByBuilding[buildingKey][floorKey]) groupedByBuilding[buildingKey][floorKey] = [];
+            groupedByBuilding[buildingKey][floorKey].push({ name: f.name, layer_type: f.layer_type }); // CHANGED: store object, not just name
+        }
     });
 
     // Building polygons -> match placePOIs' expected shape
@@ -452,6 +558,7 @@ function transformFacilities(facilities) {
         const coords = poly.coords;
         const buildingName = poly.building;
         const floorMap = groupedByBuilding[poly.building] || {};
+        const classroomMap = groupedClassroomsByBuilding[poly.building] || {};
 
         let declaredFloors = [];
         if (poly.floor) {
@@ -477,11 +584,17 @@ function transformFacilities(facilities) {
             }
         }
 
+        const classroomFloors = Object.keys(classroomMap);
+        for (let i = 0; i < classroomFloors.length; i++) {
+            if (!floorLabels.includes(classroomFloors[i])) floorLabels.push(classroomFloors[i]);
+        }
+
         const floors = floorLabels.map(floorLabel => ({
             level: floorLabel,
             label: floorLabel,
-            classrooms: [],
-            items: floorMap[floorLabel] || []
+            classrooms: classroomMap[floorLabel] || [],
+            items: floorMap[floorLabel] || [],
+            image_url: (poly.floor_images && poly.floor_images[floorLabel]) || null
         }));
 
         return {
@@ -494,7 +607,7 @@ function transformFacilities(facilities) {
         };
     });
 
-    const pointItems = pointFacilities.filter(f => f.coords); 
+    const pointItems = pointFacilities.filter(f => f.coords && f.layer_type !== 'classroom'); 
 
     return { buildingItems, pointItems };
 }
